@@ -1,0 +1,343 @@
+
+/* GLOBAL STYLES */
+
+body {
+  color: #333;
+  background: #f1f1f1;  
+  margin: 0;
+  padding: 0; 
+  font-family: Helvetica Neue, sans-serif;
+  font-weight: 300;
+}
+
+.hr {
+  width: 100%;
+  border-bottom: 1px dashed #999;
+  margin: 20px 0;
+  height: 1px;
+  float: left;   
+}
+
+#main {
+  float: left; 
+}
+
+/* END GLOBAL STYLES */
+
+/* BUTTONS AND LINKS */
+
+a:link, a:visited, span.toggle {
+  color: #f88400;
+  text-decoration: none; 
+  cursor: pointer;  
+}
+
+a:hover, span.toggle:hover {
+ color: #d75b00;
+}
+
+.button, a.button, input.button {
+ background: #f88400;
+ color: #fff;
+ padding: 5px 10px;
+ text-decoration: none;
+ text-shadow: none;
+ float: left; 
+ border: none;  
+}
+
+.button:hover {
+ background: #ffb25a;
+ color: #7c470a;   
+}
+
+.button.large {
+  font-size: 22px;
+  padding: 10px 15px 8px;   
+}
+
+.button.small {
+    padding: 4px 8px 2px;
+}
+
+.button.red {
+  background: #D30000;   
+}
+
+.button.red:hover {
+  color: #fff;
+  background: #c90000;   
+}
+
+.red {
+  color: #bf2a38;   
+}
+
+.small {
+  font-size: 12px;   
+}
+
+span.link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 100;   
+}
+
+span.link:hover {
+  cursor: pointer;   
+}
+
+.tooltip {
+    display:none;
+    background:#333;
+    font-size:11px;
+    height:auto;
+    width:140px;
+    padding:10px 15px;
+    color:#eee;
+    text-shadow: none;
+}
+
+.tooltip:before {
+    border-color: #333 rgba(0, 0, 0, 0) -moz-use-text-color;
+    border-left: 10px solid rgba(0, 0, 0, 0);
+    border-style: solid solid none;
+    border-width: 10px 10px 0;
+    bottom: -10px;
+    content: " ";
+    display: block;
+    height: 0;
+    left: 80px;
+    position: absolute;
+    width: 0;
+    z-index: 2;
+}
+  
+  
+/* END BUTTONS AND LINKS */
+
+/* TYPOGRAPHY */
+body, .pure-g-r, .pure-g-r [class*="pure-u"] {
+  font-family: "Myriad Pro",Helvetica Neue,Helvetica,Arial,sans-serif;
+}
+
+h1 {
+  font-size: 48px; 
+  font-weight: 100; 
+  letter-spacing: -1px; 
+  margin: 0 0 20px 0;
+}
+
+p {
+  margin: 0 0 15px 0;   
+}
+
+table {
+    
+}
+
+thead {
+  font-weight: bold;   
+}
+
+td {
+  padding: 5px;   
+}
+
+.diff {
+  color: ; 
+}
+
+.diff.red {
+  color: #D30000;   
+}
+
+span.curr {
+  font-size: 11px;   
+}
+
+span.percent {
+   font-size: 11px;   
+}
+
+/* END TYPOGRAPHY */
+
+/* FORMS */
+fieldset {
+  border: none; 
+}
+
+legend {
+  margin: 0 0 20px 0;  
+  font-style: italic; 
+}
+
+fieldset p {
+  float: left;
+  width: 100%;   
+}
+
+fieldset span.mandatory {
+  position: absolute;
+  left: 0;   
+}
+
+label {
+  font-weight: bold;
+  float: left;
+  width: 200px;   
+}
+
+input[type="text"], input[type="email"], textarea {
+    border: medium none;
+    box-shadow: none;
+    font-family: "Myriad Pro";
+    font-size: 15px;
+    line-height: 1em;
+    padding: 10px 15px;
+    width: 350px;
+    color: #999;
+}
+
+/* END FORMS */
+
+.centered {
+  width: 1000px;
+  margin-left: -500px;
+  left: 50%;
+  position: relative;
+}
+
+/* HEADER SPECIFIC */
+
+#header {
+  margin-top: 20px;  
+  margin-bottom: 20px; 
+  float: left;
+  width: 100%;
+  border-bottom: 1px dashed #c1c1c1;
+  position: relative;
+}
+
+#header h1 {
+  margin: 0 0 10px;   
+}
+
+
+/* END HEADER SPECIFIC */
+
+/* HOMEPAGE SPECIFIC */
+
+/* END HOMEPAGE SPECIFC */
+
+
+/* PAGE STYLES */
+
+#left p {
+  font-size: 13px;
+  line-height: 1.8em;   
+}
+
+p.intro, #left p.intro {
+  font-size: 1.3em;   
+}
+
+
+#right .box {
+  float: right; 
+  margin: 0 0 20px 0;
+  position: relative;    
+}
+
+#right .box img {
+  width: 100%;   
+}
+
+#right .box .price {
+  margin: 10px 0 0;   
+}
+
+#right .box p:last-child {
+  margin: 0;   
+}
+
+#right div.white {
+  background: #fff;
+}
+
+#right div .inner {
+  padding: 15px;   
+}
+
+#right div h3 {
+  margin: 0;   
+}
+
+
+/* END PAGE STYLES */
+
+/* FOOTER STYLES */
+#footer {
+  background: url('../images/footer_back.png') repeat top left; 
+  float: left;
+  height: 200px;
+  padding: 30px 0 100px 0;
+  margin: 50px 0 0 0;
+  width: 100%;  
+  box-shadow: 0 1px 5px #ccc inset;
+  border-top: 2px solid #bbb;
+}
+
+#footer h4 {
+  margin: 5px 0 10px;   
+}
+
+#footer ul {
+  list-style-type: none;
+  padding: 0 30px 0 0;
+  margin: 0; 
+  font-size: 0.8em;
+  line-height: 1.6em;  
+}
+
+#footer ul#social {
+  margin: 0;
+  padding: 0; 
+  list-style-type: none; 
+  float: right;
+  width: 200px; 
+}
+
+#footer ul#social li.first {
+  float: left;
+  text-transform: uppercase;
+  padding: 17px 0 0;   
+  margin: 0 5px 0 0;
+}
+
+#footer ul#social li a {
+  height: 52px;
+  width: 52px;
+  background: url('/static/images/social-icons.png') no-repeat top left;
+  float: left;
+  margin: 0 0 0 5px;
+}
+
+#footer ul#social li a:hover {
+  background-position: 0 -52px;   
+}
+
+#footer ul#social li a#facebook {
+  background-position: -104px 0px;   
+}
+
+#footer ul#social li a#facebook:hover {
+  background-position: -104px -52px;   
+}
+
+/* END FOOTER STYLES
+

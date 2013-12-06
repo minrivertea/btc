@@ -1,0 +1,242 @@
+{% extends base_template %}
+{% load thumbnail staticfiles mathfilters %}
+
+{% block pagetitle %}Home{% endblock %}
+
+
+{% block extrajs %}
+<script type="text/javascript">
+
+function highLight(item) {
+    // take the value of the highlighted amount and then
+    // according to the exchange rate, highlight the value
+    // difference between this and all of the ones on the right
+     
+     
+    var curr = item.attr('data-curr')
+      
+    $('#chinese.exchange_list li').each(function(i,v) {
+        
+        var fx = parseFloat($('#' + curr + '_SELL').text());
+        var price = parseFloat($(v).attr('data-price'));
+        
+        // DIFFERENCE: (highlighted item price * fx rate) - item price
+        var diff = ( (parseFloat(item.attr('data-price')) * fx) - price );
+        $(v).find('.result .diff .price').text(diff.toFixed(2));
+        
+        $(v).find('.result').addClass('visible');
+        
+        if (diff < 0) {
+             $(v).find('.result').addClass('red');
+        } else {
+             $(v).find('.result').removeClass('red');   
+        } 
+        
+        // MIN-SELL
+        var minSell = (parseFloat(item.attr('data-price')) * fx) ;
+        $(v).find('.result .min-sell .price').text(minSell.toFixed(2));
+        
+         
+    });     
+}
+
+
+$(document).ready( function() {
+   $('#western.exchange_list li').click( function() {
+      $('.exchange_list li').removeClass('selected');
+      $(this).toggleClass('selected'); 
+      highLight( $(this) );     
+   });
+   
+   
+   
+   
+});
+</script>
+{% endblock %}
+
+{% block extracss %}
+<style type="text/css">
+.exchange_list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;   
+}
+
+.exchange_list li {
+  background: #f6f6f6;
+  padding: 5px 10px;
+  width: 100px;
+  margin: 0 0 5px 0;
+  position: relative;   
+}
+
+.exchange_list li:hover {
+  cursor: pointer;
+  background: #f9f9f9;
+}
+
+.exchange_list li.selected {
+  background: #fff;   
+}
+
+#western {
+  float: left;   
+}
+
+#chinese {
+  float: right;
+  text-align: right;   
+}
+
+#western.exchange_list li .price {
+    bottom: 0;
+    display: none;
+    font-size: 13px;
+    height: 10px;
+    margin: auto 0;
+    position: absolute;
+    right: -110px;
+    text-align: left;
+    top: 0;
+    width: 100px;
+}
+
+#western.exchange_list li.selected .price {
+  display: block;   
+}
+
+#chinese .result {
+    bottom: 0;
+    display: none;
+    font-size: 13px;
+    height: 12px;
+    margin: auto 0;
+    position: absolute;
+    right: 130px;
+    text-align: right;
+    top: 0;
+    width: 170px;
+    color: #777;
+}
+
+#chinese .result .diff {
+  color: #105d0a;   
+}
+
+#chinese .result div {
+  float: right;
+  width: auto;
+  margin: 0 5px 0 0;   
+}
+
+#chinese .result.visible {
+  display: block;   
+}
+
+#chinese .result.visible .price {
+  display: inline;   
+}
+
+#chinese .result.red .diff {
+  color: #D30000;   
+}
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="pure-g-r">
+    <div class="pure-u-1">
+        
+        <ul id="western" class="exchange_list">
+        {% for x in data %}
+            <li data-curr="{{ x.curr }}" data-price="{{ x.price }}">
+                <span class="name">{{ x.name }}</span>
+                <span class="price">
+                    {{ x.price }} {{ x.curr }}
+                </span>
+            </li>
+        {% endfor %}
+        </ul>
+        
+        <ul id="chinese" class="exchange_list">
+        {% for x in chinese_data %}
+            {% if x.name %}
+            <li data-price="{{ x.price|floatformat:'2' }}" data-curr="{{ x.curr }}">
+                <span class="result">
+
+                    <div class="min-sell">
+                        / 
+                        <span class="price"></span>
+                        <span class="curr">RMB</span>
+                    </div>
+                    
+                    <div class="diff">
+                        <span class="price"></span>
+                        <span class="curr">RMB</span>
+                    </div>
+                    
+                    
+                </span>
+                {{ x.name }}
+            </li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+        
+        <br clear="all"/>
+        <p>&nbsp;</p>
+        <table id="fx_rates">
+            <thead>
+                <td>CURR</td>
+                <td>Buy</td>
+                <td>Sell</td>
+            </thead>
+
+            {% for x in fx_rates %}
+                <tr>
+                    <td id="{{ x.name }}">{{ x.name }}</td>
+                    <td id="{{ x.name }}_BUY">{{ x.buy }}</td>
+                    <td id="{{ x.name }}_SELL">{{ x.sell }}</td>
+                </tr>
+            {% endfor %}
+            
+        </table>
+        
+        <table>
+            <thead>
+                <td>Exchange</td>
+                <td>Buy price</td>
+                <td>Min. Sell price</td> 
+                {% for x in chinese_data %}
+                    <td>{{ x.name }}</td>
+                {% endfor %}
+            </thead>
+            {% for x in data %}
+            <tr>
+                <td width="140px">{{ x.name }}</td>
+                <td width="100px">{{ x.price }} <span class="curr">{{ x.curr }}</span></td>
+                <td width="120px">{{ x.min_sell }} <span class="curr">RMB</span></td>
+                
+                {% for c in chinese_data %}
+                <td>
+                    {% if c.price %}
+                    <span class="diff{% if c.price|sub:x.min_sell < 0 %} red{% endif %}">
+                        {{ c.price|sub:x.min_sell }} <span class="curr">RMB</span>
+                    </span>
+
+                    <span class="percent">
+                        / {% with c.price|div:x.min_sell as dec %}{{ dec|mul:100|sub:100|floatformat:"2" }}%{% endwith %}
+                    </span>
+                    {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </table>
+    </div>
+
+</div>
+{% endblock %}
