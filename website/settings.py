@@ -145,8 +145,15 @@ CHINESE_SITES = (
     'CHBTC',
     'BTCCHINA',
     'BTC38',
+    '796',
+    'BTER',
 )
 
+
+try:
+    from local_settings import *
+except:
+    pass
 
 # A sample logging configuration. The only tangible logging
 # performed by this configuration is to send an email to

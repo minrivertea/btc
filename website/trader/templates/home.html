@@ -10,22 +10,39 @@
 function highLight(item) {
     // take the value of the highlighted amount and then
     // according to the exchange rate, highlight the value
-    // difference between this and all of the ones on the right
+    // difference between this and all of the ones on the right    
+    
      
-     
-    var curr = item.attr('data-curr')
+    var buyCurrency = item.attr('data-curr');
+    var buyPrice = parseFloat(item.attr('data-price'));
+    
       
     $('#chinese.exchange_list li').each(function(i,v) {
         
-        var fx = parseFloat($('#' + curr + '_SELL').text());
-        var price = parseFloat($(v).attr('data-price'));
+        var sellPrice = parseFloat($(v).attr('data-price'));
+        var sellCurrency = $(v).attr('data-curr');
         
-        // DIFFERENCE: (highlighted item price * fx rate) - item price
-        var diff = ( (parseFloat(item.attr('data-price')) * fx) - price );
+        if (buyCurrency == sellCurrency) {
+           var fx = 1;   
+        } else {
+            var fx = parseFloat($('#'+buyCurrency+'_'+sellCurrency).text());
+        }
+        
+        /// FIND THE PRICE DIFFERENCE BETWEEN THE BUY/SELL EXCHANGES
+        
+        if (buyCurrency == sellCurrency) {
+            var diff = (sellPrice - buyPrice);
+        } else {
+            var diff = ( sellPrice - (buyPrice * fx) );            
+        }
+        
+                
+
         $(v).find('.result .diff .price').text(diff.toFixed(2));
+        $(v).find('.result .diff .curr').text(sellCurrency);
+        
         
         $(v).find('.result').addClass('visible');
-        
         if (diff < 0) {
              $(v).find('.result').addClass('red');
         } else {
@@ -33,8 +50,13 @@ function highLight(item) {
         } 
         
         // MIN-SELL
-        var minSell = (parseFloat(item.attr('data-price')) * fx) ;
+        var minSell = (buyPrice * fx) ;
         $(v).find('.result .min-sell .price').text(minSell.toFixed(2));
+        $(v).find('.result .min-sell .curr').text(sellCurrency);
+        
+        /// PERCENTAGE
+        var percent = (( diff / minSell) * 100).toFixed(2)
+        $(v).find('.result .percent .price').text(percent);
         
          
     });     
@@ -57,10 +79,50 @@ $(document).ready( function() {
 
 {% block extracss %}
 <style type="text/css">
+
+#titles {
+  float: left;
+  width: 100%;
+  position: relative;
+  height: 40px; 
+}
+
+#titles span {
+  position: absolute;
+  font-size: 0.9em;
+}
+
+#titles span.large {
+  font-weight: bold;
+  font-size: 1.2em;   
+}
+
+#titles span.one {
+  left: 0;   
+}
+
+#titles span.two {
+  left: 250px;   
+}
+
+#titles span.three {
+  left: 435px;   
+}
+
+#titles span.four {
+  left: 545px;   
+}
+
+#titles span.five {
+  left: 710px;   
+}
+
 .exchange_list {
   list-style-type: none;
   padding: 0;
-  margin: 0;   
+  margin: 0;
+  position: absolute;
+  top: 30px;   
 }
 
 .exchange_list li {
@@ -81,12 +143,15 @@ $(document).ready( function() {
 }
 
 #western {
-  float: left;   
+  float: left;
+  margin: 0 150px 0 0;   
 }
 
 #chinese {
-  float: right;
-  text-align: right;   
+    float: left;
+    left: 250px;
+    position: absolute;
+    text-align: left;
 }
 
 #western.exchange_list li .price {
@@ -108,16 +173,16 @@ $(document).ready( function() {
 
 #chinese .result {
     bottom: 0;
+    color: #777777;
     display: none;
     font-size: 13px;
     height: 12px;
+    left: 130px;
     margin: auto 0;
     position: absolute;
-    right: 130px;
     text-align: right;
     top: 0;
-    width: 170px;
-    color: #777;
+    width: 400px;
 }
 
 #chinese .result .diff {
@@ -125,8 +190,8 @@ $(document).ready( function() {
 }
 
 #chinese .result div {
-  float: right;
-  width: auto;
+  float: left;
+  width: 120px;
   margin: 0 5px 0 0;   
 }
 
@@ -142,6 +207,10 @@ $(document).ready( function() {
   color: #D30000;   
 }
 
+#fx_rates {
+  display: none;   
+}
+
 </style>
 {% endblock %}
 
@@ -150,33 +219,49 @@ $(document).ready( function() {
 <div class="pure-g-r">
     <div class="pure-u-1">
         
+        <div id="titles">
+            <span class="one large">Buy from</span>
+            <span class="two large">Sell on</span>
+            <span class="three">Profit/Loss</span>
+            <span class="four">Min. Sell Price</span>
+            <span class="five">% Diff</span>
+        </div>        
+        
         <ul id="western" class="exchange_list">
-        {% for x in data %}
+        {% for x in buy_data %}
+            {% if x.name %}
             <li data-curr="{{ x.curr }}" data-price="{{ x.price }}">
                 <span class="name">{{ x.name }}</span>
                 <span class="price">
                     {{ x.price }} {{ x.curr }}
                 </span>
             </li>
+            {% endif %}
         {% endfor %}
         </ul>
         
         <ul id="chinese" class="exchange_list">
-        {% for x in chinese_data %}
+        {% for x in sell_data %}
             {% if x.name %}
             <li data-price="{{ x.price|floatformat:'2' }}" data-curr="{{ x.curr }}">
                 <span class="result">
 
-                    <div class="min-sell">
-                        / 
-                        <span class="price"></span>
-                        <span class="curr">RMB</span>
-                    </div>
-                    
                     <div class="diff">
                         <span class="price"></span>
-                        <span class="curr">RMB</span>
+                        <span class="curr"></span>
                     </div>
+                    
+                    <div class="min-sell">
+                        <span class="price"></span>
+                        <span class="curr"></span>
+                    </div>
+                    
+                    <div class="percent">
+                        <span class="price"></span>
+                        %
+                    </div>
+                    
+                    
                     
                     
                 </span>
@@ -188,54 +273,16 @@ $(document).ready( function() {
         
         <br clear="all"/>
         <p>&nbsp;</p>
-        <table id="fx_rates">
-            <thead>
-                <td>CURR</td>
-                <td>Buy</td>
-                <td>Sell</td>
-            </thead>
-
-            {% for x in fx_rates %}
-                <tr>
-                    <td id="{{ x.name }}">{{ x.name }}</td>
-                    <td id="{{ x.name }}_BUY">{{ x.buy }}</td>
-                    <td id="{{ x.name }}_SELL">{{ x.sell }}</td>
-                </tr>
-            {% endfor %}
-            
-        </table>
         
-        <table>
-            <thead>
-                <td>Exchange</td>
-                <td>Buy price</td>
-                <td>Min. Sell price</td> 
-                {% for x in chinese_data %}
-                    <td>{{ x.name }}</td>
-                {% endfor %}
-            </thead>
-            {% for x in data %}
-            <tr>
-                <td width="140px">{{ x.name }}</td>
-                <td width="100px">{{ x.price }} <span class="curr">{{ x.curr }}</span></td>
-                <td width="120px">{{ x.min_sell }} <span class="curr">RMB</span></td>
-                
-                {% for c in chinese_data %}
-                <td>
-                    {% if c.price %}
-                    <span class="diff{% if c.price|sub:x.min_sell < 0 %} red{% endif %}">
-                        {{ c.price|sub:x.min_sell }} <span class="curr">RMB</span>
-                    </span>
-
-                    <span class="percent">
-                        / {% with c.price|div:x.min_sell as dec %}{{ dec|mul:100|sub:100|floatformat:"2" }}%{% endwith %}
-                    </span>
-                    {% endif %}
-                </td>
-                {% endfor %}
-            </tr>
-        {% endfor %}
-        </table>
+        
+        <ul id="fx_rates">
+            {% for x in fx_data %}
+                <li id="{{ x.buy_curr }}_{{ x.sell_curr }}">{{ x.price }}</li>
+            {% endfor %}        
+        </ul>
+        
+        
+        
     </div>
 
 </div>

@@ -161,15 +161,33 @@ def home(request):
     
     
     # GET TODAY'S BOC EXCHANGE RATES
-    key = '%s-%s-%s-BOC' % (now.year, now.month, now.day)
+    key = 'FX-%s-%s-%s' % (now.year, now.month, now.day)
     fx_rates = _search_redis(key)
     
     fx_rates = ast.literal_eval(fx_rates['rates'])
-    print type(fx_rates)
-    print fx_rates
+    
+    fx_data = []
+    for x in fx_rates:
+        mapping = {}
+        
+        mapping['buy_curr'] = x['name']
+        mapping['sell_curr'] = 'RMB'
+        mapping['price'] = x['buy']
+        fx_data.append(mapping)    
+        
+        mapping = {}
+        mapping['buy_curr'] = 'RMB'
+        mapping['sell_curr'] = x['name']
+        mapping['price'] = (1 / x['sell'])
+        fx_data.append(mapping)
+    
+    
+    
+    
     
     # GET THE WESTERN BTC TRADE SITES
-    data = []
+    buy_data = []
+    sell_data = []
     for s in settings.WESTERN_SITES:
         rounded_now = now - timedelta(minutes=now.minute % 15,
                             seconds=now.second,
@@ -186,12 +204,13 @@ def home(request):
             if result:
                 result['old'] = True
             
-        data.append(result)
+        buy_data.append(result)
+        sell_data.append(result)
         
         
         
     # GET THE CHINESE SITES    
-    chinese_data = []
+    
     for s in settings.CHINESE_SITES:
         rounded_now = now - timedelta(minutes=now.minute % 15,
                             seconds=now.second,
@@ -208,7 +227,8 @@ def home(request):
             if result:
                 result['old'] = True
         
-        chinese_data.append(result)
+        buy_data.append(result)
+        sell_data.append(result)
                 
     return _render(request, 'home.html', locals())
 

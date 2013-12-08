@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 
 # APP
-from website.redis_helper import _get_redis, _add_to_redis
+from website.redis_helper import _get_redis, _add_to_redis, _search_redis
 
 
 
@@ -23,34 +23,35 @@ class Command(NoArgsCommand):
         
         now = datetime.now()
         
-        # GET Bank of China EXCHANGE RATES
-        try:
-            r = requests.get('http://www.boc.cn/sourcedb/whpj/enindex.html')
-            soup = BeautifulSoup(r.content)
-            
-            rmb_gbp_buy_rate = (float(soup.body.find_all('td', text='GBP')[0].findNextSibling('td').text) / 100)
-            rmb_usd_buy_rate = (float(soup.body.find_all('td', text='USD')[0].findNextSibling('td').text) / 100)
-            rmb_eur_buy_rate = (float(soup.body.find_all('td', text='EUR')[0].findNextSibling('td').text) / 100)
-                        
-            rmb_gbp_sell_rate = (float(soup.body.find_all('td', text='GBP')[0].findNextSibling('td').findNextSibling('td').findNextSibling('td').text) / 100)
-            rmb_usd_sell_rate = (float(soup.body.find_all('td', text='USD')[0].findNextSibling('td').findNextSibling('td').findNextSibling('td').text) / 100)   
-            rmb_eur_sell_rate = (float(soup.body.find_all('td', text='EUR')[0].findNextSibling('td').findNextSibling('td').findNextSibling('td').text) / 100)
-            
-            
-            rates = []
-            rates.append({'name': 'USD', 'buy':rmb_usd_buy_rate, 'sell': rmb_usd_sell_rate})
-            rates.append({'name': 'GBP', 'buy':rmb_gbp_buy_rate, 'sell': rmb_gbp_sell_rate})
-            rates.append({'name': 'EUR','buy':rmb_eur_buy_rate, 'sell': rmb_eur_sell_rate})
-
-            mapping = {
-                'rates': rates,
-            }
-            
-            key = '%s-%s-%s-BOC' % (now.year, now.month, now.day)
-            _add_to_redis(key, mapping)
-            
-        except requests.ConnectionError:
-            print "failed to add BOC rates"
+        # GET BANK OF CHINA EXCHANGE RATES
+        key = 'FX-%s-%s-%s' % (now.year, now.month, now.day)
+        if not _search_redis(key):
+            try:
+                r = requests.get('http://www.boc.cn/sourcedb/whpj/enindex.html')
+                soup = BeautifulSoup(r.content)
+                
+                rmb_gbp_buy_rate = (float(soup.body.find_all('td', text='GBP')[0].findNextSibling('td').text) / 100)
+                rmb_usd_buy_rate = (float(soup.body.find_all('td', text='USD')[0].findNextSibling('td').text) / 100)
+                rmb_eur_buy_rate = (float(soup.body.find_all('td', text='EUR')[0].findNextSibling('td').text) / 100)
+                            
+                rmb_gbp_sell_rate = (float(soup.body.find_all('td', text='GBP')[0].findNextSibling('td').findNextSibling('td').findNextSibling('td').text) / 100)
+                rmb_usd_sell_rate = (float(soup.body.find_all('td', text='USD')[0].findNextSibling('td').findNextSibling('td').findNextSibling('td').text) / 100)   
+                rmb_eur_sell_rate = (float(soup.body.find_all('td', text='EUR')[0].findNextSibling('td').findNextSibling('td').findNextSibling('td').text) / 100)
+                
+                
+                rates = []
+                rates.append({'name': 'USD', 'buy':rmb_usd_buy_rate, 'sell': rmb_usd_sell_rate})
+                rates.append({'name': 'GBP', 'buy':rmb_gbp_buy_rate, 'sell': rmb_gbp_sell_rate})
+                rates.append({'name': 'EUR','buy':rmb_eur_buy_rate, 'sell': rmb_eur_sell_rate})
+    
+                mapping = {
+                    'rates': rates,
+                }
+                
+                _add_to_redis(key, mapping)
+                
+            except requests.ConnectionError:
+                print "failed to add BOC rates"
         
         
         
@@ -64,13 +65,12 @@ class Command(NoArgsCommand):
         
         try:
             # MTGOX TRADE DATA IN GBP
-            r = requests.get('http://data.mtgox.com/api/2/BTCUSD/money/ticker_fast')
+            r = requests.get('http://data.mtgox.com/api/2/BTCGBP/money/ticker_fast')
             j = simplejson.loads(r.content)    
             mapping = {}
             mapping['name'] = 'MtGOX'
             mapping['price'] = '%.2f' % float(j['data']['buy']['value'])
             mapping['curr'] = j['data']['buy']['currency']
-            mapping['min_sell'] = '%.2f' % float(float(mapping['price']) * (rmb_usd_sell_rate/100))
             key = "%s:%s" % (base_key, 'MTGOX')
             _add_to_redis(key, mapping)
         except:
@@ -86,7 +86,6 @@ class Command(NoArgsCommand):
             mapping['name'] = 'Bittylicious'
             mapping['price'] = '%.2f' % float(j['totalPrice'])
             mapping['curr'] = 'GBP'
-            mapping['min_sell'] = '%.2f' % float(float(mapping['price']) * (rmb_gbp_sell_rate/100))
             key = "%s:%s" % (base_key, site)
             _add_to_redis(key, mapping)
         except:
@@ -103,7 +102,6 @@ class Command(NoArgsCommand):
             mapping['url'] = 'http://www.bitstamp.net'
             mapping['price'] = '%.2f' % float(j['last'])
             mapping['curr'] = 'USD'
-            mapping['min_sell'] = '%.2f' % float(float(mapping['price']) * (rmb_usd_sell_rate/100))
             key = "%s:%s" % (base_key, site)
             _add_to_redis(key, mapping)
         except:
@@ -119,7 +117,6 @@ class Command(NoArgsCommand):
             mapping['url'] = 'http://www.btc-e.com'
             mapping['price'] = '%.2f' % float(j['ticker']['last'])
             mapping['curr'] = 'USD'
-            mapping['min_sell'] = '%.2f' % float(float(mapping['price']) * (rmb_usd_sell_rate/100))
             key = "%s:%s" % (base_key, site)
             _add_to_redis(key, mapping)
         except:
@@ -128,7 +125,7 @@ class Command(NoArgsCommand):
        
         site = "BTCTRADE"        
         try:
-            r = requests.get('http://www.btcclubs.com/btc_sum.js')
+            r = requests.get('http://www.btcclubs.com/btc_sum.js?t=6428515')
             j = simplejson.loads(r.content)
             total = 0
             count = 0
@@ -195,7 +192,54 @@ class Command(NoArgsCommand):
 
         
         
-        # www.btc38.com
-        # http://www.btc38.com/trade/getTradeList.php?coinname=BTC
-        # {"buyOrder":[{"price":"5503.000000","amount":"0.444000"},
-
+        site = "796"
+        try:
+            r = requests.get('http://api.796.com/apiV2/ticker.html?op=futures')
+            j = simplejson.loads(r.content)
+            mapping = {}
+            mapping['name'] = site
+            mapping['url'] = 'https://796.com'
+            mapping['price'] = "%.2f" % float(j['return']['last'])
+            mapping['curr'] = 'USD'
+            key = "%s:%s" % (base_key, site)
+            _add_to_redis(key, mapping)
+        except:
+            print "Failed to add %s prices" % site 
+        
+        
+        site = "BTC38"
+        try:
+            r = requests.get('http://www.btc38.com/trade/getTradeList.php?coinname=BTC')
+            j = simplejson.loads(r.content.strip())
+            mapping = {}
+            mapping['name'] = site
+            mapping['url'] = 'https://www.btc38.com'
+            
+            count = 0
+            total = 0
+            for x in j['buyOrder']:
+                count += 1
+                total += x['price']
+            
+            mapping['price'] = "%.2f" % float(total/count)
+            mapping['curr'] = 'RMB'
+            key = "%s:%s" % (base_key, site)
+            _add_to_redis(key, mapping)
+        except JSONDecodeError:
+            print "Failed to add %s prices (%s)" % (site, 'JSONDecodeError')
+        
+        
+        
+        site = "BTER"
+        try:
+            r = requests.get('https://bter.com/api/1/ticker/btc_cny')
+            j = simplejson.loads(r.content.strip())
+            mapping = {}
+            mapping['name'] = site
+            mapping['url'] = 'https://www.bter.com'
+            mapping['price'] = "%.2f" % float(j['avg'])
+            mapping['curr'] = 'RMB'
+            key = "%s:%s" % (base_key, site)
+            _add_to_redis(key, mapping)
+        except JSONDecodeError:
+            print "Failed to add %s prices (%s)" % (site, 'JSONDecodeError')
