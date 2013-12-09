@@ -167,7 +167,7 @@ def home(request):
     
     buy_data = []
     for s in settings.BITCOIN_EXCHANGES:
-        rounded_now = now - timedelta(minutes=now.minute % 45,
+        rounded_now = now - timedelta(minutes=now.minute % 15,
                             seconds=now.second,
                             microseconds=now.microsecond)
         key = "%s:%s" % (rounded_now.strftime("%Y-%m-%d-%H%M"), s)
