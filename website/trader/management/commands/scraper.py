@@ -23,9 +23,27 @@ class Command(NoArgsCommand):
         
         now = datetime.now()
         
-        # GET BANK OF CHINA EXCHANGE RATES
-        key = 'FX-%s-%s-%s' % (now.year, now.month, now.day)
-        if not _search_redis(key):
+        
+        # GET THE EXCHANGE RATES
+        currency_key = 'FX-%s-%s-%s' % (now.year, now.month, now.day)
+        if not _search_redis(currency_key):
+            
+            currency_mapping = {}
+
+            # FROM OPENEXCHANGERATES.ORG
+            try:
+                r = requests.get('http://openexchangerates.org/api/latest.json?app_id=16924ac0d18643f5b37c73e370b9a366')
+                j = simplejson.loads(r.content)
+                # remember base currency is USD
+                currency_mapping['USD_GBP'] = j['rates']['GBP']
+                currency_mapping['USD_EUR'] = j['rates']['EUR']
+                currency_mapping['GBP_USD'] = (1/j['rates']['GBP'])
+                currency_mapping['EUR_USD'] = (1/j['rates']['EUR'])
+            except:
+                print "Failed to get exchange rates from openexchangerates.org"
+            
+        
+            # GET BANK OF CHINA EXCHANGE RATES
             try:
                 r = requests.get('http://www.boc.cn/sourcedb/whpj/enindex.html')
                 soup = BeautifulSoup(r.content)
@@ -38,21 +56,18 @@ class Command(NoArgsCommand):
                 rmb_usd_sell_rate = (float(soup.body.find_all('td', text='USD')[0].findNextSibling('td').findNextSibling('td').findNextSibling('td').text) / 100)   
                 rmb_eur_sell_rate = (float(soup.body.find_all('td', text='EUR')[0].findNextSibling('td').findNextSibling('td').findNextSibling('td').text) / 100)
                 
+                currency_mapping['GBP_RMB'] = rmb_gbp_buy_rate
+                currency_mapping['USD_RMB'] = rmb_usd_buy_rate
+                currency_mapping['EUR_RMB'] = rmb_eur_buy_rate
+                currency_mapping['RMB_USD'] = (1/rmb_usd_sell_rate)
+                currency_mapping['RMB_GBP'] = (1/rmb_gbp_sell_rate)
+                currency_mapping['RMB_EUR'] = (1/rmb_eur_sell_rate)
                 
-                rates = []
-                rates.append({'name': 'USD', 'buy':rmb_usd_buy_rate, 'sell': rmb_usd_sell_rate})
-                rates.append({'name': 'GBP', 'buy':rmb_gbp_buy_rate, 'sell': rmb_gbp_sell_rate})
-                rates.append({'name': 'EUR','buy':rmb_eur_buy_rate, 'sell': rmb_eur_sell_rate})
-    
-                mapping = {
-                    'rates': rates,
-                }
-                
-                _add_to_redis(key, mapping)
                 
             except requests.ConnectionError:
                 print "failed to add BOC rates"
         
+            _add_to_redis(currency_key, currency_mapping)
         
         
         # THIS PROVIDES THE BASE KEY FOR ALL THE SITES WE'LL ADD
@@ -63,18 +78,18 @@ class Command(NoArgsCommand):
 
         
         
+        site = 'MTGOX'
         try:
-            # MTGOX TRADE DATA IN GBP
             r = requests.get('http://data.mtgox.com/api/2/BTCGBP/money/ticker_fast')
             j = simplejson.loads(r.content)    
             mapping = {}
-            mapping['name'] = 'MtGOX'
+            mapping['name'] = site
             mapping['price'] = '%.2f' % float(j['data']['buy']['value'])
             mapping['curr'] = j['data']['buy']['currency']
-            key = "%s:%s" % (base_key, 'MTGOX')
+            key = "%s:%s" % (base_key, site)
             _add_to_redis(key, mapping)
-        except:
-            pass
+        except JSONDecodeError:
+            print "Failed to add %s prices" % site
             
         
         site = 'BITTYLICIOUS'

@@ -132,14 +132,11 @@ REDIS_DB_ID = 9
 
 # INFO ABOUT SITES TO SCRAPE
 # --------------------------------------------------------------
-WESTERN_SITES = (
+BITCOIN_EXCHANGES = (
     'MTGOX',
     'BITSTAMP',
     'BITTYLICIOUS',
     'BTC-E',
-)
-
-CHINESE_SITES = (
     'BTCTRADE',
     'HUOBI',
     'CHBTC',

@@ -7,67 +7,147 @@
 {% block extrajs %}
 <script type="text/javascript">
 
-function highLight(item) {
-    // take the value of the highlighted amount and then
-    // according to the exchange rate, highlight the value
-    // difference between this and all of the ones on the right    
-    
+function highLight(item) {    
      
     var buyCurrency = item.attr('data-curr');
     var buyPrice = parseFloat(item.attr('data-price'));
     
-      
-    $('#chinese.exchange_list li').each(function(i,v) {
+    /// AMOUNTS AND CURRENCY ENTERED BY USER       
+    var userAmount = $('input#user-amount').val();
+    var userCurrency = $('input[name="user-currency"]:checked').val();
+    
+    
+    /// WHAT IS TOTAL BTC BUY WITH USER AMOUNT?
+    if (userCurrency == buyCurrency) {
+        var btcBuy = ( userAmount / buyPrice )
+    } else {
+        var fx = parseFloat($('#'+userCurrency+'_'+buyCurrency).text());
+        var btcBuy = ( (userAmount * fx) / buyPrice)             
+    }
         
+    item.find('.buy_price .price').text(buyPrice.toFixed(2));
+    item.find('.buy_price .curr').text(buyCurrency);
+    item.find('.btc_buy').text(btcBuy.toFixed(4));
+
+    var bestPrice = 0;
+    var bestPriceEx = '';
+    
+    /// UPDATE THE AMOUNTS FOR EACH SELL EXCHANGE  
+    $('.exchange').not('.exchange.excluded').each(function(i,v) {
+        
+        
+        
+        if (item.find('.buy_from .name').text() == $(v).find('.sell_on').text() ) {
+           $(v).addClass('grey');   
+        } else {
+           $(v).removeClass('grey');   
+        }
+         
         var sellPrice = parseFloat($(v).attr('data-price'));
         var sellCurrency = $(v).attr('data-curr');
         
-        if (buyCurrency == sellCurrency) {
-           var fx = 1;   
-        } else {
-            var fx = parseFloat($('#'+buyCurrency+'_'+sellCurrency).text());
-        }
-        
-        /// FIND THE PRICE DIFFERENCE BETWEEN THE BUY/SELL EXCHANGES
-        
-        if (buyCurrency == sellCurrency) {
-            var diff = (sellPrice - buyPrice);
-        } else {
-            var diff = ( sellPrice - (buyPrice * fx) );            
-        }
-        
-                
+        $(v).find('.sell_price .price').text(sellPrice.toFixed(2));
+        $(v).find('.sell_price .curr').text(sellCurrency);
 
-        $(v).find('.result .diff .price').text(diff.toFixed(2));
-        $(v).find('.result .diff .curr').text(sellCurrency);
+        /// FIND THE PRICE DIFFERENCE BETWEEN THE BUY/SELL EXCHANGES
+        var fx = parseFloat($('#'+sellCurrency+'_'+buyCurrency).text());
         
         
-        $(v).find('.result').addClass('visible');
-        if (diff < 0) {
-             $(v).find('.result').addClass('red');
+        var totalSellPrice = (sellPrice * btcBuy)
+        var fx = parseFloat( $('#'+sellCurrency+'_'+userCurrency).text() );
+        var totalSellPriceOriginalCurrency = (totalSellPrice * fx)
+        
+        
+        var original = ( totalSellPrice.toFixed(2) + ' ' + sellCurrency)
+        $(v).find('.total_out').attr('title', original) ;
+        $(v).find('.total_out .price').text(totalSellPriceOriginalCurrency.toFixed(2));
+        $(v).find('.total_out .curr').text(userCurrency);
+        
+        
+        
+        var profitLoss = (totalSellPriceOriginalCurrency - userAmount );
+        $(v).find('.profit_loss .price').text(profitLoss.toFixed(2));
+        $(v).find('.profit_loss .curr').text(userCurrency);
+        
+        
+
+        if (profitLoss < 0) {
+             $(v).addClass('red');
         } else {
-             $(v).find('.result').removeClass('red');   
+             $(v).removeClass('red');   
         } 
         
-        // MIN-SELL
-        var minSell = (buyPrice * fx) ;
-        $(v).find('.result .min-sell .price').text(minSell.toFixed(2));
-        $(v).find('.result .min-sell .curr').text(sellCurrency);
+        /// MINIMUM SELL PRICE TO GET A ZERO-SUM
+        var fx = parseFloat( $('#'+buyCurrency+'_'+sellCurrency).text() );
+        var minSell = (buyPrice * fx)
         
+                
         /// PERCENTAGE
-        var percent = (( diff / minSell) * 100).toFixed(2)
-        $(v).find('.result .percent .price').text(percent);
+        var percent = ( (profitLoss / totalSellPriceOriginalCurrency) * 100 ).toFixed(2)
+        
+        /// BEST PRICE
+        if (totalSellPriceOriginalCurrency > bestPrice) {
+           bestPrice = totalSellPriceOriginalCurrency ;
+           bestPriceEx = '';
+           bestPriceEx = $(v).find('.sell_on').text();
+        }
+        
+        /// UPDATE ALL THE DATA IN THE TABLE
+        $(v).find('.percent .num').text(percent);
+        $(v).find('.min_sell .price').text(minSell.toFixed(2));
+        $(v).find('.min_sell .curr').text(sellCurrency);
+        
         
          
-    });     
+    }); 
+    
+    
+    $('.excluded td span').not('.buy_from span, .sell_on, .exclude span').text('');
+    $('#best_price .price').text(bestPrice.toFixed(2));
+    $('#best_price .currency').text(userCurrency);
+    $('#best_price .exchange').text(bestPriceEx);
+            
 }
 
 
 $(document).ready( function() {
-   $('#western.exchange_list li').click( function() {
-      $('.exchange_list li').removeClass('selected');
-      $(this).toggleClass('selected'); 
-      highLight( $(this) );     
+   
+   /// SETUP THE MAIN TABLE OF EXCHANGES AND DATA
+   $('.buy_from').click( function() {
+      
+      /// CLEAR ALL OTHERS
+      $('.buy_from').parent('.exchange').removeClass('selected');
+      $('.buy_price .price').text('');
+      $('.buy_price .curr').text('');
+      $('.btc_buy').text('');
+      
+      $(this).parent('.exchange').toggleClass('selected');
+      highLight( $(this).parent('tr') );     
+   });
+   
+   /// SETUP THE RADIO BUTTONS
+   $('#radios input[type="radio"]:checked').parent('label').addClass('selected');
+   $('#radios input[type="radio"]').click( function() {
+      $('#radios input[type="radio"]').parent('label').removeClass('selected');
+      $('#radios input[type="radio"]:checked').parent('label').addClass('selected');
+      
+      highLight( $('.exchange.selected') );
+      
+   });
+   
+   /// SETUP THE EXCLUDE BUTTON
+   
+   
+   $('.exclude a').click( function(e) {
+      $(this).parent('td').parent('tr').toggleClass('excluded');
+            
+      if ($('.text', this).text() == '+') {
+          $('.text', this).text('x');
+      } else {
+          $('.text', this).text('+');
+      }
+      highLight( $('.exchange.selected') );
+      e.preventDefault();
    });
    
    
@@ -80,132 +160,123 @@ $(document).ready( function() {
 {% block extracss %}
 <style type="text/css">
 
-#titles {
+#user_amounts {
   float: left;
   width: 100%;
-  position: relative;
-  height: 40px; 
+  margin: 0 0 20px 0;
+  border-bottom: 1px solid #fff;
+  padding: 0 0 10px 0;   
 }
 
-#titles span {
-  position: absolute;
-  font-size: 0.9em;
-}
-
-#titles span.large {
-  font-weight: bold;
-  font-size: 1.2em;   
-}
-
-#titles span.one {
-  left: 0;   
-}
-
-#titles span.two {
-  left: 250px;   
-}
-
-#titles span.three {
-  left: 435px;   
-}
-
-#titles span.four {
-  left: 545px;   
-}
-
-#titles span.five {
-  left: 710px;   
-}
-
-.exchange_list {
-  list-style-type: none;
+#user_amounts #user-amount {
+  float: left; 
+  margin: 0 5px 0 0;
+  background: none;
   padding: 0;
-  margin: 0;
-  position: absolute;
-  top: 30px;   
-}
-
-.exchange_list li {
-  background: #f6f6f6;
-  padding: 5px 10px;
+  font-size: 50px;
+  font-weight: bold;
+  color: #333;
   width: 100px;
-  margin: 0 0 5px 0;
-  position: relative;   
+  line-height: 0.8em;
+  height: 45px;  
 }
 
-.exchange_list li:hover {
+#user_amounts #radios {
+  float: left;
+  width: auto;
+  position: relative;
+  top: 10px;   
+}
+
+#best_price {
+  float: right;
+  text-align: right;
+  position: relative;
+}
+
+#best_price .price {
+  font-size: 50px;
+  font-weight: bold; 
+  line-height: 0.9em;  
+}
+
+#best_price .currency {
+  font-size: 20px;
+  font-weight: bold;   
+}
+
+#radios label {
+  background: #f1f1f1;
+  color: #999;
+  padding: 5px 8px 2px;
+  width: auto;
+  margin: 0px 0 0; 
+  font-weight: normal;  
+}
+
+#radios label:hover {
   cursor: pointer;
+  background: #f6f6f6;   
+}
+
+#radios label.selected {
+  color: #333;
+  background: #fff;
+  font-weight: bold;   
+}
+
+#radios input[type="radio"] {
+  display: none;   
+}
+
+
+table#list {
+  float: left;
+  font-size: 13px; 
+}
+
+#list td {
+  padding: 5px 10px;
+  border-bottom: 3px solid #f1f1f1;  
+  width: 80px; 
+}
+
+#list td.exclude {
+  width: 10px; 
+  position: relative;  
+}
+
+
+#list .buy_from {
+  background: none;
+  color: #999;   
+}
+
+#list .buy_from:hover {
   background: #f9f9f9;
+  cursor: pointer;   
 }
 
-.exchange_list li.selected {
-  background: #fff;   
+#list .exchange.selected .buy_from, #list .exchange.selected .buy_price, #list .exchange.selected .btc_buy {
+  background: #fff;
+  color: #333;   
 }
 
-#western {
-  float: left;
-  margin: 0 150px 0 0;   
-}
+#list .exchange .sell_on, #list .exchange .sell_price, #list .exchange .total_out, #list .exchange .percent, #list .exchange .profit_loss, #list .exchange .min_sell  {
+  background: #fff; 
+}    
 
-#chinese {
-    float: left;
-    left: 250px;
-    position: absolute;
-    text-align: left;
-}
-
-#western.exchange_list li .price {
-    bottom: 0;
-    display: none;
-    font-size: 13px;
-    height: 10px;
-    margin: auto 0;
-    position: absolute;
-    right: -110px;
-    text-align: left;
-    top: 0;
-    width: 100px;
-}
-
-#western.exchange_list li.selected .price {
-  display: block;   
-}
-
-#chinese .result {
-    bottom: 0;
-    color: #777777;
-    display: none;
-    font-size: 13px;
-    height: 12px;
-    left: 130px;
-    margin: auto 0;
-    position: absolute;
-    text-align: right;
-    top: 0;
-    width: 400px;
-}
-
-#chinese .result .diff {
-  color: #105d0a;   
-}
-
-#chinese .result div {
-  float: left;
-  width: 120px;
-  margin: 0 5px 0 0;   
-}
-
-#chinese .result.visible {
-  display: block;   
-}
-
-#chinese .result.visible .price {
-  display: inline;   
-}
-
-#chinese .result.red .diff {
+#list .buy_from.red {
   color: #D30000;   
 }
+
+
+.grey .sell_on, .grey .sell_price, .grey .total_out, .grey .profit_loss, .grey .min_sell, .grey .percent {
+  color: #d1d1d1;   
+}
+
+
+
 
 #fx_rates {
   display: none;   
@@ -219,66 +290,88 @@ $(document).ready( function() {
 <div class="pure-g-r">
     <div class="pure-u-1">
         
-        <div id="titles">
-            <span class="one large">Buy from</span>
-            <span class="two large">Sell on</span>
-            <span class="three">Profit/Loss</span>
-            <span class="four">Min. Sell Price</span>
-            <span class="five">% Diff</span>
-        </div>        
+        <div id="user_amounts">
+            <input type="text" value="" id="user-amount" value="100" class="clearMeFocus"/>
+            <div id="radios">
+            <label><input type="radio" name="user-currency" checked="checked" value="GBP">GBP</label>
+            <label><input type="radio" name="user-currency" value="USD">USD</label>
+            <label><input type="radio" name="user-currency" value="EUR">EUR</label>
+            <label><input type="radio" name="user-currency" value="RMB">RMB</label>
+            </div>
+            <div id="best_price">
+                <span class="price"></span>
+                <span class="currency"></span>
+                on <span class="exchange"></span>
+            </div>
+        </div>
         
-        <ul id="western" class="exchange_list">
-        {% for x in buy_data %}
+        
+        <table id="list">
+        
+            <thead>
+                <td style="width:10px;" class="">&nbsp;</td>
+                <td>Buy from</td>
+                <td>Price</td>
+                <td>BTC Buy</td>
+                <td>Sell on</td>
+                <td>Sell price</td>
+                <td>Total out</td>
+                <td>+ / -</td>
+                <td>Percent</td>
+                <td>Min-sell</td>
+            </thead>
+            
+            {% for x in buy_data %}
             {% if x.name %}
-            <li data-curr="{{ x.curr }}" data-price="{{ x.price }}">
-                <span class="name">{{ x.name }}</span>
-                <span class="price">
-                    {{ x.price }} {{ x.curr }}
-                </span>
-            </li>
+                <tr id="{{ x.name }}" class="exchange" data-price="{{ x.price|floatformat:'2' }}" data-curr="{{ x.curr }}">
+                    <td class="exclude">
+                        <a href=""><span class="text">X</span></a>
+                    </td>
+                    <td class="buy_from">
+                        
+                        <span class="name">{{ x.name }}</span>
+                    </td>
+                    <td class="buy_price">
+                        
+                        <span class="price"></span>
+                        <span class="curr"></span>
+                    </td>
+                    <td class="btc_buy"></td>
+                    <td class="sell_on">{{ x.name }}</td>
+                    <td class="sell_price">
+                        <span class="price"></span>
+                        <span class="curr"></span>
+                    </td>
+                    <td class="total_out">
+                        <span class="price"></span>
+                        <span class="curr"></span>
+                    </td>
+                    <td class="profit_loss">
+                        <span class="price"></span>
+                        <span class="curr"></span>
+                    </td>
+                    <td class="percent">
+                        <span class="num"></span> %
+                    </td>
+                    <td class="min_sell">
+                        <span class="price"></span>
+                        <span class="curr"></span>
+                    </td> 
+                </tr>
             {% endif %}
-        {% endfor %}
-        </ul>
-        
-        <ul id="chinese" class="exchange_list">
-        {% for x in sell_data %}
-            {% if x.name %}
-            <li data-price="{{ x.price|floatformat:'2' }}" data-curr="{{ x.curr }}">
-                <span class="result">
+            {% endfor %}
+            
 
-                    <div class="diff">
-                        <span class="price"></span>
-                        <span class="curr"></span>
-                    </div>
-                    
-                    <div class="min-sell">
-                        <span class="price"></span>
-                        <span class="curr"></span>
-                    </div>
-                    
-                    <div class="percent">
-                        <span class="price"></span>
-                        %
-                    </div>
-                    
-                    
-                    
-                    
-                </span>
-                {{ x.name }}
-            </li>
-            {% endif %}
-        {% endfor %}
-        </ul>
-        
-        <br clear="all"/>
-        <p>&nbsp;</p>
         
         
         <ul id="fx_rates">
-            {% for x in fx_data %}
-                <li id="{{ x.buy_curr }}_{{ x.sell_curr }}">{{ x.price }}</li>
-            {% endfor %}        
+            {% for k,v in fx_rates.items %}
+                <li id="{{ k }}">{{ v }}</li>
+            {% endfor %}  
+                <li id="GBP_GBP">1</li>
+                <li id="RMB_RMB">1</li>
+                <li id="USD_USD">1</li>
+                <li id="EUR_EUR">1</li>      
         </ul>
         
         
