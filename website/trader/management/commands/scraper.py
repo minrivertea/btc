@@ -71,7 +71,7 @@ class Command(NoArgsCommand):
         
         
         # THIS PROVIDES THE BASE KEY FOR ALL THE SITES WE'LL ADD
-        rounded_now = now - timedelta(minutes=now.minute % 15,
+        rounded_now = now - timedelta(minutes=now.minute % settings.SCRAPE_INTERVAL,
                                  seconds=now.second,
                                  microseconds=now.microsecond)
         base_key = rounded_now.strftime("%Y-%m-%d-%H%M")   
@@ -87,6 +87,7 @@ class Command(NoArgsCommand):
             mapping['price'] = '%.2f' % float(j['data']['buy']['value'])
             mapping['curr'] = j['data']['buy']['currency']
             key = "%s:%s" % (base_key, site)
+            print key
             _add_to_redis(key, mapping)
         except JSONDecodeError:
             print "Failed to add %s prices" % site

@@ -101,7 +101,6 @@ function highLight(item) {
          
     }); 
     
-    
     $('.excluded td span').not('.buy_from span, .sell_on, .exclude span').text('');
     $('#best_price .price').text(bestPrice.toFixed(2));
     $('#best_price .currency').text(userCurrency);
@@ -136,8 +135,6 @@ $(document).ready( function() {
    });
    
    /// SETUP THE EXCLUDE BUTTON
-   
-   
    $('.exclude a').click( function(e) {
       $(this).parent('td').parent('tr').toggleClass('excluded');
             
@@ -149,6 +146,13 @@ $(document).ready( function() {
       highLight( $('.exchange.selected') );
       e.preventDefault();
    });
+   
+   
+   // IF NOTHING IS SELECTED, SELECT THE FIRST ITEM
+   if ( $('.exchange.selected').length == 0 ) {
+      $('.exchange:first-child').addClass('selected');
+      highLight( $('.exchange:first-child') );
+   }
    
    
    
@@ -291,7 +295,7 @@ table#list {
     <div class="pure-u-1">
         
         <div id="user_amounts">
-            <input type="text" value="" id="user-amount" value="100" class="clearMeFocus"/>
+            <input type="text" id="user-amount" value="100" class="clearMeFocus"/>
             <div id="radios">
             <label><input type="radio" name="user-currency" checked="checked" value="GBP">GBP</label>
             <label><input type="radio" name="user-currency" value="USD">USD</label>
