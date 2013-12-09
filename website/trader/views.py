@@ -108,7 +108,7 @@ def home(request):
         buy_data.append(result)
         
         
-        
+    print buy_data    
                 
     return _render(request, 'home.html', locals())
 

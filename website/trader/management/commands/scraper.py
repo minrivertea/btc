@@ -1,5 +1,6 @@
 
 # DJANGO
+from django.conf import settings
 from django.core.management.base import NoArgsCommand, CommandError
 
 # PYTHON CORE
@@ -35,9 +36,13 @@ class Command(NoArgsCommand):
                 r = requests.get('http://openexchangerates.org/api/latest.json?app_id=16924ac0d18643f5b37c73e370b9a366')
                 j = simplejson.loads(r.content)
                 # remember base currency is USD
-                currency_mapping['USD_GBP'] = j['rates']['GBP']
+                currency_mapping['USD_GBP'] = j['rates']['GBP'] # eg. 1.645
                 currency_mapping['USD_EUR'] = j['rates']['EUR']
+                
                 currency_mapping['GBP_USD'] = (1/j['rates']['GBP'])
+                currency_mapping['GBP_EUR'] = j['rates']['GBP']/j['rates']['EUR']
+                
+                currency_mapping['EUR_GBP'] = j['rates']['EUR']/j['rates']['GBP']
                 currency_mapping['EUR_USD'] = (1/j['rates']['EUR'])
             except:
                 print "Failed to get exchange rates from openexchangerates.org"
@@ -84,10 +89,10 @@ class Command(NoArgsCommand):
             j = simplejson.loads(r.content)    
             mapping = {}
             mapping['name'] = site
+            mapping['url'] = 'http://www.mtgox.com'
             mapping['price'] = '%.2f' % float(j['data']['buy']['value'])
             mapping['curr'] = j['data']['buy']['currency']
             key = "%s:%s" % (base_key, site)
-            print key
             _add_to_redis(key, mapping)
         except JSONDecodeError:
             print "Failed to add %s prices" % site
@@ -100,6 +105,7 @@ class Command(NoArgsCommand):
             j = simplejson.loads(r.content)
             mapping = {}
             mapping['name'] = 'Bittylicious'
+            mapping['url'] = 'http://www.bittylicious.com'
             mapping['price'] = '%.2f' % float(j['totalPrice'])
             mapping['curr'] = 'GBP'
             key = "%s:%s" % (base_key, site)

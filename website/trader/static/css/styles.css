@@ -3,7 +3,7 @@
 
 body {
   color: #333;
-  background: #f1f1f1;  
+  background: #fff;  
   margin: 0;
   padding: 0; 
   font-family: Helvetica Neue, sans-serif;
@@ -126,10 +126,11 @@ body, .pure-g-r, .pure-g-r [class*="pure-u"] {
 }
 
 h1 {
-  font-size: 48px; 
-  font-weight: 100; 
-  letter-spacing: -1px; 
-  margin: 0 0 20px 0;
+    font-size: 40px;
+    font-weight: 100;
+    letter-spacing: -1px;
+    margin: 0 0 20px;
+    text-transform: lowercase;
 }
 
 p {
@@ -235,7 +236,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2b2b2b', end
 
 #header h1 {
   margin: 0px;
-  color: #C48F00;   
+  color: #999;   
 }
 
 
