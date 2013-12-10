@@ -30,6 +30,7 @@ from django.core.exceptions import MultipleObjectsReturned
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.cache import cache_page
+from django.views.generic import TemplateView
 
 
 # APP
@@ -105,13 +106,27 @@ def home(request):
                 key = "%s:%s" % (rounded_now.strftime("%Y-%m-%d-%H%M"), s)
                 result = _search_redis(key)
             
-        buy_data.append(result)
-        
-        
-    print buy_data    
+        buy_data.append(result) 
+    
+    print buy_data       
                 
     return _render(request, 'home.html', locals())
 
 
 def buy(request, id):
     return
+
+
+def page(request, slug):
+    
+    template = '%s.html' % slug
+    
+    return _render(request, template, locals())  
+
+
+    
+    
+    
+    
+    
+    

@@ -16,6 +16,8 @@ function highLight(item) {
     var userAmount = parseFloat($('#user-amount').text());
     var userCurrency = $('input[name="user-currency"]:checked').val();
     
+    $('#buy #name span').text(item.find('.buy_from').text());
+    
     
     /// WHAT IS TOTAL BTC BUY WITH USER AMOUNT?
     if (userCurrency == buyCurrency) {
@@ -71,8 +73,10 @@ function highLight(item) {
 
         if (profitLoss < 0) {
              $(v).addClass('red');
+             $(v).removeClass('green');
         } else {
-             $(v).removeClass('red');   
+             $(v).removeClass('red');
+             $(v).addClass('green');   
         } 
         
         /// MINIMUM SELL PRICE TO GET A ZERO-SUM
@@ -87,7 +91,7 @@ function highLight(item) {
         if (totalSellPriceOriginalCurrency > bestPrice) {
            bestPrice = totalSellPriceOriginalCurrency ;
            bestPriceEx = '';
-           bestPriceEx = $(v).find('.sell_on').text();
+           bestPriceEx = $(v).find('.sell_on .name').text();
         }
         
         /// UPDATE ALL THE DATA IN THE TABLE
@@ -101,7 +105,7 @@ function highLight(item) {
     
     $('#best_price .price').text(bestPrice.toFixed(2));
     $('#best_price .currency').text(userCurrency);
-    $('#best_price .exchange').text(bestPriceEx);
+    $('#best_price .name').text(bestPriceEx);
             
 }
 
@@ -148,6 +152,7 @@ $(document).ready( function() {
    
    // IF NOTHING IS SELECTED, SELECT THE FIRST ITEM
    if ( $('.exchange.selected').length == 0 ) {
+      
       $('.exchange:first-child').addClass('selected');
       highLight( $('.exchange:first-child') );
    }
@@ -193,6 +198,16 @@ $(document).ready( function() {
   top: 10px;   
 }
 
+#buy {
+  float: left;   
+}
+
+#buy #name {
+  float: left;
+  width: 100%;   
+}
+
+
 #best_price {
   float: right;
   text-align: right;
@@ -211,12 +226,12 @@ $(document).ready( function() {
 }
 
 #radios label {
-  background: #f1f1f1;
+  background: none;
   color: #999;
-  padding: 5px 8px 2px;
+  padding: 4px 8px 5px;
   width: auto;
   margin: 0px 0 0; 
-  font-weight: normal;  
+  font-weight: normal;
 }
 
 #radios label:hover {
@@ -225,9 +240,9 @@ $(document).ready( function() {
 }
 
 #radios label.selected {
-  color: #333;
-  background: #fff;
-  font-weight: bold;   
+  color: #105D0A;
+  background: #f1f1f1;
+  font-weight: bold;
 }
 
 #radios input[type="radio"] {
@@ -237,7 +252,8 @@ $(document).ready( function() {
 table#list {
   float: left;
   font-size: 13px;
-  background: none; 
+  background: none;
+  width: 100%; 
 }
 
 #list td {
@@ -251,12 +267,16 @@ table#list {
   border-bottom: 1px solid #c1c1c1;   
 }
 
+#list td.num {
+  text-align: right;   
+}
+
 #list a.exclude {
     background: none repeat scroll 0 0 #F1F1F1;
     border-radius: 10px;
     float: left;
     height: 20px;
-    left: 280px;
+    left: 310px;
     margin-top: -3px;
     padding: 0;
     position: absolute;
@@ -300,7 +320,7 @@ table#list {
 }
 
 #list .exchange .sell_on, #list .exchange .sell_price, #list .exchange .total_out, #list .exchange .percent, #list .exchange .profit_loss, #list .exchange .min_sell  {
-  background: none; 
+  background: none;
 } 
 
 #list .exchange.excluded .sell_price span, #list .exchange.excluded .total_out span, #list .exchange.excluded .percent span, #list .exchange.excluded .profit_loss span, #list .exchange.excluded .min_sell span {
@@ -312,7 +332,7 @@ table#list {
 }    
 
 #list .buy_from.red {
-  color: #D30000;   
+  color: #b70000;   
 }
 
 
@@ -333,18 +353,26 @@ table#list {
         
         <div id="user_amounts">
 
-            <span contenteditable="true" id="user-amount">100</span>
-
-            <div id="radios">
-            <label><input type="radio" name="user-currency" checked="checked" value="GBP">GBP</label>
-            <label><input type="radio" name="user-currency" value="USD">USD</label>
-            <label><input type="radio" name="user-currency" value="EUR">EUR</label>
-            <label><input type="radio" name="user-currency" value="RMB">RMB</label>
+            <div id="buy">
+                <span contenteditable="true" id="user-amount">100</span>
+                
+    
+                <div id="radios">
+                    <label><input type="radio" name="user-currency" checked="checked" value="GBP">GBP</label>
+                    <label><input type="radio" name="user-currency" value="USD">USD</label>
+                    <label><input type="radio" name="user-currency" value="EUR">EUR</label>
+                    <label><input type="radio" name="user-currency" value="RMB">RMB</label>
+                </div>
+            
+                <div id="name">
+                    on <span class=""></span>
+                </div>
             </div>
+            
             <div id="best_price">
                 <span class="price"></span>
-                <span class="currency"></span>
-                on <span class="exchange"></span>
+                <span class="currency"></span><br/>
+                on <span class="name"></span>
             </div>
         </div>
         
@@ -356,11 +384,11 @@ table#list {
                 <td>Price</td>
                 <td>BTC Buy</td>
                 <td>Sell on</td>
-                <td>Sell price</td>
-                <td>Total out</td>
-                <td>+ / -</td>
-                <td>Percent</td>
-                <td>Min-sell</td>
+                <td class="num">Sell price</td>
+                <td class="num">Total out</td>
+                <td class="num">+ / -</td>
+                <td class="num">Percent</td>
+                <td class="num">Min-sell</td>
             </thead>
             
             {% for x in buy_data %}
@@ -380,23 +408,23 @@ table#list {
                         <a href="" class="exclude"><span class="text">-</span></a>
                         <a href="{{ x.url }}"><span class="name">{{ x.name }}</span></a>
                     </td>
-                    <td class="sell_price" valign="middle">
+                    <td class="sell_price num" valign="middle">
                         <span class="price"></span>
                         <span class="curr"></span>
                     </td>
-                    <td class="total_out">
+                    <td class="total_out num">
                         <span class="price"></span>
                         <span class="curr"></span>
                     </td>
-                    <td class="profit_loss">
+                    <td class="profit_loss num">
                         <span class="price"></span>
                         <span class="curr"></span>
                     </td>
-                    <td class="percent">
+                    <td class="percent num">
                         <span class="num"></span> 
                         <span class="symbol">%</span>
                     </td>
-                    <td class="min_sell">
+                    <td class="min_sell num">
                         <span class="price"></span>
                         <span class="curr"></span>
                     </td> 

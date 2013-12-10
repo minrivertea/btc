@@ -27,7 +27,7 @@ body {
 /* BUTTONS AND LINKS */
 
 a:link, a:visited, span.toggle {
-  color: #f88400;
+  color: #4183C4;
   text-decoration: none; 
   cursor: pointer;  
 }
@@ -61,7 +61,7 @@ a:hover, span.toggle:hover {
 }
 
 .button.red {
-  background: #D30000;   
+  background: #b70000;   
 }
 
 .button.red:hover {
@@ -71,6 +71,10 @@ a:hover, span.toggle:hover {
 
 .red {
   color: #bf2a38;   
+}
+
+.green {
+  color: #105D0A;   
 }
 
 .small {
@@ -133,6 +137,17 @@ h1 {
     text-transform: lowercase;
 }
 
+h2 {
+  font-size: 40px;
+  margin: 15px 0 15px 0;   
+}
+
+h3 {
+  font-size: 24px;
+  font-weight: normal;
+  border-bottom: 1px solid #e1e1e1;   
+}
+
 p {
   margin: 0 0 15px 0;   
 }
@@ -154,7 +169,7 @@ td {
 }
 
 .diff.red {
-  color: #D30000;   
+  color: #b70000;   
 }
 
 span.curr {
@@ -220,7 +235,7 @@ input[type="text"], input[type="email"], textarea {
   margin: 0 0 20px; 
   float: left;
   width: 100%;
-  border-bottom: 3px solid #ED9A00;
+  border-bottom: 3px solid #105d0a;
   position: relative;
   
 background: rgb(43,43,43); /* Old browsers */
@@ -236,7 +251,43 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2b2b2b', end
 
 #header h1 {
   margin: 0px;
-  color: #999;   
+  color: #999;
+  float: left;
+  margin: 0 30px 0 0;   
+}
+
+#header h1 a {
+  color: #fff;   
+}
+
+#header h1 a:hover {
+  opacity: 0.8;   
+}
+
+#header h1 span {
+  color: #4183C4;
+}
+
+#header ul {
+  list-style-type: none;
+  float: left;
+  padding: 0;
+  margin: 0;   
+}
+
+#header ul li {
+  float: left;
+  position: relative;
+  top: 20px;   
+}
+
+#header ul li a {
+  padding: 8px 15px 5px;
+  color: #fff;   
+}
+
+#header ul li a:hover {
+  text-decoration: underline;
 }
 
 
@@ -249,9 +300,18 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2b2b2b', end
 
 /* PAGE STYLES */
 
-#left p {
+p {
   font-size: 13px;
   line-height: 1.8em;   
+}
+
+p.big {
+  font-size: 1.3em;   
+}
+
+p[class*="pure-u-1-3"] {
+  padding: 0 30px 0 0;
+  width: 30%;   
 }
 
 p.intro, #left p.intro {
