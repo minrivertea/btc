@@ -23,9 +23,9 @@ DATABASES = {
     }
 }
 
-ALLOWED_HOSTS = []
-TIME_ZONE = 'Europe/London'
-LANGUAGE_CODE = 'en-gb'
+ALLOWED_HOSTS =                     ['btc.westiseast.co.uk', '.bitrage.io']
+TIME_ZONE =                         'Europe/London'
+LANGUAGE_CODE =                     'en-gb'
 SITE_ID = 1
 USE_I18N = True
 USE_L10N = True

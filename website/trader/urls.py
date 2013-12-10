@@ -1,5 +1,6 @@
 from django.conf.urls.defaults import *
 from django.utils.translation import ugettext_lazy as _
+from django.views.generic import TemplateView
 
 import views
 
