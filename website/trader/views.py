@@ -88,7 +88,6 @@ def home(request):
     # GET TODAY'S EXCHANGE RATES
     key = 'FX-%s-%s-%s' % (now.year, now.month, now.day)
     fx_rates = _search_redis(key)
-           
     
     buy_data = []
     for s in settings.BITCOIN_EXCHANGES:
@@ -107,9 +106,7 @@ def home(request):
                 result = _search_redis(key)
             
         buy_data.append(result) 
-    
-    print buy_data       
-                
+                    
     return _render(request, 'home.html', locals())
 
 

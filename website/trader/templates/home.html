@@ -152,10 +152,13 @@ $(document).ready( function() {
    
    // IF NOTHING IS SELECTED, SELECT THE FIRST ITEM
    if ( $('.exchange.selected').length == 0 ) {
-      
       $('.exchange:first-child').addClass('selected');
       highLight( $('.exchange:first-child') );
    }
+   
+   $('#user-amount').keyup( function() {    
+        highLight( $('.exchange.selected') );
+   });
    
 
    
