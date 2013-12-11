@@ -7,6 +7,8 @@
 {% block extrajs %}
 <script type="text/javascript">
 
+var fxSuffix = '';
+
 function highLight(item) {    
      
     var buyCurrency = item.attr('data-curr');
@@ -19,11 +21,19 @@ function highLight(item) {
     $('#buy #name span').text(item.find('.buy_from').text());
     
     
+    if ( $('#fx_choice input[type="radio"]:checked').attr('id') == 'real_fx' ) {
+        var fxSuffix = '_real';
+    } else {
+        var fxSuffix = '_ideal';
+    }
+                
     /// WHAT IS TOTAL BTC BUY WITH USER AMOUNT?
     if (userCurrency == buyCurrency) {
         var btcBuy = ( userAmount / buyPrice )
     } else {
-        var fx = parseFloat($('#'+userCurrency+'_'+buyCurrency).text());
+        
+        var fx = parseFloat($('#'+userCurrency+'_'+buyCurrency+fxSuffix).text());
+        
         var btcBuy = ( (userAmount * fx) / buyPrice)             
     }
         
@@ -50,11 +60,11 @@ function highLight(item) {
         $(v).find('.sell_price .curr').text(sellCurrency);
 
         /// FIND THE PRICE DIFFERENCE BETWEEN THE BUY/SELL EXCHANGES
-        var fx = parseFloat($('#'+sellCurrency+'_'+buyCurrency).text());
+        var fx = parseFloat($('#'+sellCurrency+'_'+buyCurrency+fxSuffix).text());
         
         
         var totalSellPrice = (sellPrice * btcBuy)
-        var fx = parseFloat( $('#'+sellCurrency+'_'+userCurrency).text() );
+        var fx = parseFloat( $('#'+sellCurrency+'_'+userCurrency+fxSuffix).text() );
         var totalSellPriceOriginalCurrency = (totalSellPrice * fx)
         
         
@@ -80,8 +90,9 @@ function highLight(item) {
         } 
         
         /// MINIMUM SELL PRICE TO GET A ZERO-SUM
-        var fx = parseFloat( $('#'+buyCurrency+'_'+sellCurrency).text() );
-        var minSell = (buyPrice * fx)
+        var fx = parseFloat( $('#'+buyCurrency+'_'+sellCurrency+fxSuffix).text() );
+        var minSell = ( ( userAmount / btcBuy ) * fx ) ;
+        
         
                 
         /// PERCENTAGE
@@ -112,6 +123,22 @@ function highLight(item) {
 
 $(document).ready( function() {
    
+   /// SET/GET GLOBAL VARIABLE FOR FX RATES - REAL WORLD OR IDEAL 
+   $('#fx_choice input[type="radio"]:checked').parent('label').addClass('selected');
+   $('#fx_choice input[type="radio"]').click( function() {
+       if ( $(this).attr('id') == '#real_fx' ) {
+          fxSuffix = '_real';
+       } else {
+          fxSuffix = '_ideal';
+       }
+       
+       $('#fx_choice input[type="radio"]').parent('label').removeClass('selected');
+       $('#fx_choice input[type="radio"]:checked').parent('label').addClass('selected');
+       
+       highLight( $('.exchange.selected') );
+   });
+      
+   
    /// SETUP THE MAIN TABLE OF EXCHANGES AND DATA
    $('.buy_from').click( function() {
       
@@ -132,7 +159,6 @@ $(document).ready( function() {
       $('#radios input[type="radio"]:checked').parent('label').addClass('selected');
       
       highLight( $('.exchange.selected') );
-      
    });
    
    /// SETUP THE EXCLUDE BUTTON
@@ -160,6 +186,9 @@ $(document).ready( function() {
         highLight( $('.exchange.selected') );
    });
    
+   
+   
+   
 
    
 });
@@ -173,7 +202,7 @@ $(document).ready( function() {
   display: none;   
 }
 
-#user_amounts {
+#user_prefs {
   float: left;
   width: 100%;
   margin: 0 0 20px 0;
@@ -181,7 +210,7 @@ $(document).ready( function() {
   padding: 0 0 10px 0;   
 }
 
-#user_amounts #user-amount {
+#user_prefs #user-amount {
   float: left; 
   margin: 0 5px 0 0;
   background: none;
@@ -194,7 +223,7 @@ $(document).ready( function() {
   height: 45px;  
 }
 
-#user_amounts #radios {
+#user_prefs #radios {
   float: left;
   width: auto;
   position: relative;
@@ -237,20 +266,38 @@ $(document).ready( function() {
   font-weight: normal;
 }
 
-#radios label:hover {
+#radios label:hover, #fx_choice label:hover  {
   cursor: pointer;
-  background: #f6f6f6;   
+  background: #f6f6f6;
+  color: #555;   
 }
 
-#radios label.selected {
+#radios label.selected, #fx_choice label.selected {
   color: #105D0A;
   background: #f1f1f1;
   font-weight: bold;
 }
 
-#radios input[type="radio"] {
+#fx_choice {
+ float: left;
+ width: 150px;   
+}
+
+#fx_choice label {
+    color: #999999;
+    float: left;
+    font-size: 12px;
+    font-weight: normal;
+    padding: 3px 8px;
+    width: 75px;
+}
+
+
+#radios input[type="radio"], #fx_choice input[type='radio'] {
   display: none;   
 }
+
+
 
 table#list {
   float: left;
@@ -354,11 +401,10 @@ table#list {
 <div class="pure-g-r">
     <div class="pure-u-1">
         
-        <div id="user_amounts">
+        <div id="user_prefs">
 
             <div id="buy">
                 <span contenteditable="true" id="user-amount">100</span>
-                
     
                 <div id="radios">
                     <label><input type="radio" name="user-currency" checked="checked" value="GBP">GBP</label>
@@ -376,6 +422,11 @@ table#list {
                 <span class="price"></span>
                 <span class="currency"></span><br/>
                 on <span class="name"></span>
+            </div>
+            
+            <div id="fx_choice">
+                <label><input type="radio" name="currency_choice" class="" id="real_fx"/>Real World FX</label>
+                <label><input type="radio" name="currency_choice" class="" id="ideal_fx" checked="checked"/>Idealised FX</label>
             </div>
         </div>
         
@@ -441,11 +492,15 @@ table#list {
         <ul id="fx_rates">
             {% for k,v in fx_rates.items %}
                 <li id="{{ k }}">{{ v }}</li>
-            {% endfor %}  
-                <li id="GBP_GBP">1</li>
-                <li id="RMB_RMB">1</li>
-                <li id="USD_USD">1</li>
-                <li id="EUR_EUR">1</li>      
+            {% endfor %}
+                <li id="GBP_GBP_real">1</li>
+                <li id="RMB_RMB_real">1</li>
+                <li id="USD_USD_real">1</li>
+                <li id="EUR_EUR_real">1</li> 
+                <li id="GBP_GBP_ideal">1</li>
+                <li id="RMB_RMB_ideal">1</li>
+                <li id="USD_USD_ideal">1</li>
+                <li id="EUR_EUR_ideal">1</li>      
         </ul>
         
         

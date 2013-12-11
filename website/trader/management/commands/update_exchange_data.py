@@ -27,57 +27,6 @@ class Command(NoArgsCommand):
         
         now = datetime.now()
         
-        
-        # GET THE EXCHANGE RATES
-        currency_key = 'FX-%s-%s-%s' % (now.year, now.month, now.day)
-        if not _search_redis(currency_key):
-            
-            currency_mapping = {}
-
-            # FROM OPENEXCHANGERATES.ORG
-            try:
-                r = requests.get('http://openexchangerates.org/api/latest.json?app_id=16924ac0d18643f5b37c73e370b9a366')
-                j = simplejson.loads(r.content)
-                # remember base currency is USD
-                currency_mapping['USD_GBP'] = j['rates']['GBP'] # eg. 1.645
-                currency_mapping['USD_EUR'] = j['rates']['EUR']
-                
-                currency_mapping['GBP_USD'] = (1/j['rates']['GBP'])
-                currency_mapping['GBP_EUR'] = j['rates']['GBP']/j['rates']['EUR']
-                
-                currency_mapping['EUR_GBP'] = j['rates']['EUR']/j['rates']['GBP']
-                currency_mapping['EUR_USD'] = (1/j['rates']['EUR'])
-            except:
-                print "Failed to get exchange rates from openexchangerates.org"
-            
-        
-            # GET BANK OF CHINA EXCHANGE RATES
-            try:
-                r = requests.get('http://www.boc.cn/sourcedb/whpj/enindex.html')
-                soup = BeautifulSoup(r.content)
-                
-                rmb_gbp_buy_rate = (float(soup.body.find_all('td', text='GBP')[0].findNextSibling('td').text) / 100)
-                rmb_usd_buy_rate = (float(soup.body.find_all('td', text='USD')[0].findNextSibling('td').text) / 100)
-                rmb_eur_buy_rate = (float(soup.body.find_all('td', text='EUR')[0].findNextSibling('td').text) / 100)
-                            
-                rmb_gbp_sell_rate = (float(soup.body.find_all('td', text='GBP')[0].findNextSibling('td').findNextSibling('td').findNextSibling('td').text) / 100)
-                rmb_usd_sell_rate = (float(soup.body.find_all('td', text='USD')[0].findNextSibling('td').findNextSibling('td').findNextSibling('td').text) / 100)   
-                rmb_eur_sell_rate = (float(soup.body.find_all('td', text='EUR')[0].findNextSibling('td').findNextSibling('td').findNextSibling('td').text) / 100)
-                
-                currency_mapping['GBP_RMB'] = rmb_gbp_buy_rate
-                currency_mapping['USD_RMB'] = rmb_usd_buy_rate
-                currency_mapping['EUR_RMB'] = rmb_eur_buy_rate
-                currency_mapping['RMB_USD'] = (1/rmb_usd_sell_rate)
-                currency_mapping['RMB_GBP'] = (1/rmb_gbp_sell_rate)
-                currency_mapping['RMB_EUR'] = (1/rmb_eur_sell_rate)
-                
-                
-            except requests.ConnectionError:
-                print "failed to add BOC rates"
-        
-            _add_to_redis(currency_key, currency_mapping)
-        
-        
         # THIS PROVIDES THE BASE KEY FOR ALL THE SITES WE'LL ADD
         rounded_now = now - timedelta(minutes=now.minute % settings.SCRAPE_INTERVAL,
                                  seconds=now.second,
