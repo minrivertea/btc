@@ -144,6 +144,9 @@ BITCOIN_EXCHANGES = (
     'BTC38',
     '796',
     'BTER',
+    'OKCOIN',
+    'FxBTC',
+    'RMBTB',
 )
 
 

@@ -252,6 +252,8 @@ class Command(NoArgsCommand):
             _add_to_redis(key, mapping)
         except JSONDecodeError:
             print "Failed to add %s prices (%s)" % (site, 'JSONDecodeError')
+        except requests.ConnectionError:
+            print "Failed to add %s prices (%s)" % (site, 'Connection Error')
         
         
         
@@ -268,3 +270,64 @@ class Command(NoArgsCommand):
             _add_to_redis(key, mapping)
         except JSONDecodeError:
             print "Failed to add %s prices (%s)" % (site, 'JSONDecodeError')
+        
+        
+        
+        site = 'OKCOIN'
+        # {"ticker": {"buy": "5730.0", "high":"5887.0", "last":"5730.5", "low":"5250.0","sell": "5730.5", "vol":"50207.4845"}}
+        try:
+            r = requests.get('https://www.okcoin.com/api/ticker.do')
+            j = simplejson.loads(r.content.strip())
+            mapping = {}
+            mapping['name'] = site
+            mapping['url'] = 'https://www.okcoin.com'
+            mapping['price'] = "%.2f" % float(j['ticker']['buy'])
+            mapping['curr'] = 'RMB'
+            key = "%s:%s" % (base_key, site)
+            _add_to_redis(key, mapping)
+        except JSONDecodeError:
+            print "Failed to add %s prices (%s)" % (site, 'JSONDecodeError')
+            
+                
+        
+        site = 'FxBTC'
+        try:
+            r = requests.get('https://data.fxbtc.com/api?op=query_ticker&symbol=btc_cny')
+            j = simplejson.loads(r.content.strip())
+            mapping = {}
+            mapping['name'] = site
+            mapping['url'] = 'https://www.fxbtc.com'
+            mapping['price'] = "%.2f" % float(j['ticker']['last_rate'])
+            mapping['curr'] = 'RMB'
+            key = "%s:%s" % (base_key, site)
+            _add_to_redis(key, mapping)
+        
+        except JSONDecodeError:
+            print "Failed to add %s prices (%s)" % (site, 'JSONDecodeError')
+        
+               
+        #site = 'GOXBTC'
+        #https://www.goxbtc.com/homepage/createOrderInfo.json
+        
+        site = 'RMBTB'
+        #{"ticker":{"high":"596.0000", "low":"570.0000", "buy":"580.0000", "sell":"584.9900", "last":"583.0000", "vol":"1281.9785"}}
+        try:
+            r = requests.get('http://www.rmbtb.com/api/thirdparty/ticker/')
+            j = simplejson.loads(r.content.strip())
+            mapping = {}
+            mapping['name'] = site
+            mapping['url'] = 'https://www.rmbtb.com'
+            mapping['price'] = "%.2f" % float(j['ticker']['buy'])
+            mapping['curr'] = 'RMB'
+            key = "%s:%s" % (base_key, site)
+            _add_to_redis(key, mapping)
+        
+        except JSONDecodeError:
+            print "Failed to add %s prices (%s)" % (site, 'JSONDecodeError')
+        
+        
+        
+        
+        
+        
+        
