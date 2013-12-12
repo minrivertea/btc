@@ -43,11 +43,11 @@ class Command(NoArgsCommand):
                 currency_mapping['USD_RMB_ideal'] = j['rates']['CNY']
                 
                 currency_mapping['GBP_USD_ideal'] = (1/j['rates']['GBP'])
-                currency_mapping['GBP_EUR_ideal'] = j['rates']['GBP']/j['rates']['EUR']
+                currency_mapping['GBP_EUR_ideal'] = j['rates']['EUR']/j['rates']['GBP']
                 currency_mapping['GBP_RMB_ideal'] = (1/ (j['rates']['GBP']/j['rates']['CNY']))
                 
                 
-                currency_mapping['EUR_GBP_ideal'] = j['rates']['EUR']/j['rates']['GBP']
+                currency_mapping['EUR_GBP_ideal'] = j['rates']['GBP']/j['rates']['EUR']
                 currency_mapping['EUR_USD_ideal'] = (1/j['rates']['EUR'])
                 currency_mapping['EUR_RMB_ideal'] = (1/ (j['rates']['EUR']/j['rates']['CNY']))
                 
@@ -61,8 +61,8 @@ class Command(NoArgsCommand):
                 currency_mapping['USD_GBP_real'] = j['rates']['GBP'] 
                 currency_mapping['USD_EUR_real'] = j['rates']['EUR']
                 currency_mapping['GBP_USD_real'] = (1/j['rates']['GBP'])
-                currency_mapping['GBP_EUR_real'] = j['rates']['GBP']/j['rates']['EUR']
-                currency_mapping['EUR_GBP_real'] = j['rates']['EUR']/j['rates']['GBP']
+                currency_mapping['GBP_EUR_real'] = j['rates']['EUR']/j['rates']['GBP']
+                currency_mapping['EUR_GBP_real'] = j['rates']['GBP']/j['rates']['EUR']
                 currency_mapping['EUR_USD_real'] = (1/j['rates']['EUR'])
 
 

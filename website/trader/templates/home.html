@@ -19,7 +19,9 @@ function highLight(item) {
     /// CALCULATE THE DATA ENTERED BY THE USER       
     var userAmount = parseFloat($('#user-amount').text());
     var userCurrency = $('input[name="user-currency"]:checked').val();
-       
+     
+     
+    console.log(userCurrency)  
        
     $('#buy #name span').text(item.find('.buy_from').text());
     
@@ -30,14 +32,11 @@ function highLight(item) {
     }
                 
     /// WHAT IS TOTAL BTC BUY WITH USER AMOUNT?
-    if (userCurrency == buyCurrency) {
-        var btcBuy = ( userAmount / buyPrice )
-    } else {
-        
-        var fx = parseFloat($('#'+userCurrency+'_'+buyCurrency+fxSuffix).text());
-        
-        var btcBuy = ( (userAmount * fx) / buyPrice)             
-    }
+    var fx = parseFloat($('#'+userCurrency+'_'+buyCurrency+fxSuffix).text());
+    var btcBuy = ( (userAmount * fx) / buyPrice)             
+
+    
+    console.log('BTC Buy = '+btcBuy) 
         
     item.find('.buy_price .price').text(buyPrice.toFixed(2));
     item.find('.buy_price .curr').text(buyCurrency);
@@ -85,8 +84,22 @@ function highLight(item) {
         var fx = parseFloat($('#'+saleCurrency+'_'+buyCurrency+fxSuffix).text());        
         var totalSalePrice = ( (salePrice * btcBuy) - totalFees )
         
+        
+        console.log($(v).find('.sell_on .name').text()+' '+totalSalePrice);
+        
+        
+        
         var fx = parseFloat( $('#'+saleCurrency+'_'+userCurrency+fxSuffix).text() );
+
+
+        console.log('FX Formula = '+saleCurrency+'_'+userCurrency)
+        console.log(fx)
+        
+
         var totalSalePriceOriginalCurrency = (totalSalePrice * fx)
+        
+        
+        
         var original = ( totalSalePrice.toFixed(2) + ' ' + saleCurrency)
         
         $(v).find('.total_out').attr('title', original) ;
@@ -127,6 +140,7 @@ function highLight(item) {
            bestPrice = totalSalePriceOriginalCurrency ;
            bestPriceEx = '';
            bestPriceEx = $(v).find('.sell_on .name').text();
+                      
         }
         
         
