@@ -36,6 +36,10 @@ a:hover, span.toggle:hover {
  color: #d75b00;
 }
 
+a:focus, a:active {
+  border: none;   
+}
+
 .button, a.button input.button {
 	font-size: 13px;
 	color: #ffffff;
@@ -249,7 +253,7 @@ input[type="text"], input[type="email"], textarea {
 
 #header {
   padding: 15px 0; 
-  margin: 0 0 20px; 
+  margin: 0 0 10px; 
   float: left;
   width: 100%;
   border-bottom: 3px solid #4183C4;
