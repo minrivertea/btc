@@ -239,7 +239,18 @@ $(document).ready( function() {
    });
    
    
-   
+    $('.question').hover( function() {
+        
+        
+    
+    });
+    
+    $(".question").hover(function () {
+        var text = $(this).attr('title');
+        $(this).append('<div class="tooltip"><p>'+text+'</p></div>');
+    }, function () {
+        $("div.tooltip").remove();
+    });
    
 
    
@@ -308,28 +319,39 @@ $(document).ready( function() {
 }
 
 #show_settings {
+    background: none repeat scroll 0 0 #F9F9F9;
+    border-color: #E1E1E1 #E1E1E1 #F9F9F9;
+    border-image: none;
+    border-radius: 4px 4px 0 0;
+    border-style: solid;
+    border-width: 1px 1px 2px;
+    color: #A1A1A1;
     float: right;
-    padding: 5px 10px;
     font-size: 13px;
-    color: #a1a1a1;
+    padding: 5px 10px;
+    position: absolute;
+    right: 0;
+    top: -46px;
 }
 
 #show_settings img {
   position: relative;
-  top: 4px;   
+  top: 2px;
+  opacity: 0.5;
 }
 
-#show_settings.selected {
-  background: #f6f6f6;   
+#show_settings.selected img {
+  opacity: 1;
 }
 
 #settings {
-  float: left;
-  width: 96%;
-  margin: 0px 0 20px 0;
-  background: #f6f6f6;
-  padding: 10px 2%;
-  display: none;
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
+    border-bottom: 1px dashed #E1E1E1;
+    display: none;
+    float: left;
+    margin: 0 0 20px;
+    padding: 10px 0 20px;
+    width: 100%;
 }
 
 #settings.visible {
@@ -343,11 +365,19 @@ $(document).ready( function() {
   padding-right: 20px;  
 } 
 
+#settings div:last-child {
+  border-right: none;   
+}
+
 #settings div h4 {
   margin: 0 0 5px 0;
   font-size: 15px; 
   text-transform: uppercase;  
 }
+
+
+
+
 
 #radios label, #settings label, #trade_fees label {
   background: none;
@@ -372,7 +402,7 @@ $(document).ready( function() {
 
 #fx_choice {
  float: left;
- width: 80px;   
+ width: 85px;   
 }
 
 #settings label {
@@ -504,20 +534,19 @@ table#list {
 
 
 {% block content %}
-<div class="pure-g-r">
-    <div class="pure-u-1">
         
-        <a href="" id="show_settings"><img src="{% static 'images/settings.png' %}" /> Settings</a>
+        
+        <a href="" id="show_settings"><img src="{% static 'images/settings.png' %}" /></a>
         <div id="settings">
         
             <div id="fx_choice">
-                <h4>FX Rates</h4>
+                <h4>FX Rates <span class="question" title="Real world FX reflects price differences between buy and sell rates; idealised rates exchange equally between either currency.">?</span></h4>
                 <label><input type="radio" name="currency_choice" class="" id="real_fx"/>Real World FX</label>
                 <label><input type="radio" name="currency_choice" class="" id="ideal_fx" checked="checked"/>Idealised FX</label>
             </div>
             
             <div id="trade_fees">
-                <h4>Trade Fees</h4>
+                <h4>Trade Fees <span class="question" title="Include or exclude estimated trade/transfer fees in the calculations.">?</span></h4>
                 <label><input type="radio" name="trade_fees" id="include_trade_fees" checked="checked" />Include Trade Fees</label>
                 <label><input type="radio" name="trade_fees" id="exclude_trade_fees" checked="checked" />Exclude Trade Fees</label>
             </div>
@@ -548,7 +577,6 @@ table#list {
                 on <span class="name"></span>
             </div>
             
-            
         </div>
         
         
@@ -573,7 +601,6 @@ table#list {
             {% if x.name %}
                 <tr id="{{ x.name }}" class="exchange" data-price="{{ x.price|floatformat:'2' }}" data-curr="{{ x.curr }}" data-trade-fee="{{ x.trade_fee }}" data-transfer-fee="{{ x.transfer_fee }}">
                     <td class="buy_from">
-                        
                         <span class="name">{{ x.name }}</span>
                     </td>
                     <td class="buy_price">
@@ -609,6 +636,7 @@ table#list {
                 </tr>
             {% endif %}
             {% endfor %}
+        </table>
             
 
         
@@ -625,11 +653,6 @@ table#list {
                 <li id="RMB_RMB_ideal">1</li>
                 <li id="USD_USD_ideal">1</li>
                 <li id="EUR_EUR_ideal">1</li>      
-        </ul>
-        
-        
-        
-    </div>
+        </ul>      
 
-</div>
 {% endblock %}
