@@ -37,7 +37,7 @@ class Command(NoArgsCommand):
         
         site = 'MTGOX'
         try:
-            r = requests.get('http://data.mtgox.com/api/2/BTCGBP/money/ticker_fast')
+            r = requests.get('https://data.mtgox.com/api/2/BTCGBP/money/ticker_fast')
             j = simplejson.loads(r.content)    
             mapping = {}
             mapping['name'] = site
@@ -47,7 +47,7 @@ class Command(NoArgsCommand):
             key = "%s:%s" % (base_key, site)
             _add_to_redis(key, mapping)
         except JSONDecodeError:
-            print "Failed to add %s prices" % site
+            print "Failed to add %s prices (JSONDecodeError)" % site
             
         
         site = 'BITTYLICIOUS'
@@ -62,7 +62,7 @@ class Command(NoArgsCommand):
             mapping['curr'] = 'GBP'
             key = "%s:%s" % (base_key, site)
             _add_to_redis(key, mapping)
-        except:
+        except JSONDecodeError:
             print "failed to add %s prices" % site
             
             
@@ -253,6 +253,8 @@ class Command(NoArgsCommand):
         
         except JSONDecodeError:
             print "Failed to add %s prices (%s)" % (site, 'JSONDecodeError')
+        except requests.ConnectionError:
+            print "Failed to add %s prices (%s)" % (site, 'ConnectionError')
         
                
         #site = 'GOXBTC'

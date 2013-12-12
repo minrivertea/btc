@@ -89,8 +89,6 @@ def home(request):
     key = 'FX-%s-%s-%s' % (now.year, now.month, now.day)
     fx_rates = _search_redis(key)
     
-    for x,v in fx_rates.items():
-        print "%s: %s" % (x, v)
     
     buy_data = []
     for s in settings.BITCOIN_EXCHANGES:
