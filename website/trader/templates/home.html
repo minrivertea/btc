@@ -10,16 +10,18 @@
 var fxSuffix = '';
 
 function highLight(item) {    
-     
+    
+    
+    /// CALCULATE THE BUY VARIABLES 
     var buyCurrency = item.attr('data-curr');
     var buyPrice = parseFloat(item.attr('data-price'));
     
-    /// AMOUNTS AND CURRENCY ENTERED BY USER       
+    /// CALCULATE THE DATA ENTERED BY THE USER       
     var userAmount = parseFloat($('#user-amount').text());
     var userCurrency = $('input[name="user-currency"]:checked').val();
-    
+       
+       
     $('#buy #name span').text(item.find('.buy_from').text());
-    
     
     if ( $('#fx_choice input[type="radio"]:checked').attr('id') == 'real_fx' ) {
         var fxSuffix = '_real';
@@ -46,41 +48,59 @@ function highLight(item) {
     
     /// UPDATE THE AMOUNTS FOR EACH SELL EXCHANGE  
     $('.exchange').not('.exchange.excluded').each(function(i,v) {
-                
+
+
+        /// IF THE EXCHANGE IS NOT SELECTED, GREY IT OUT        
         if (item.find('.buy_from .name').text() == $(v).find('.sell_on').text() ) {
            $(v).addClass('grey');   
         } else {
            $(v).removeClass('grey');   
         }
-         
-        var sellPrice = parseFloat($(v).attr('data-price'));
-        var sellCurrency = $(v).attr('data-curr');
         
-        $(v).find('.sell_price .price').text(sellPrice.toFixed(2));
-        $(v).find('.sell_price .curr').text(sellCurrency);
+        
+        /// GET THE SALE VARIABLES 
+        var salePrice = parseFloat($(v).attr('data-price'));
+        var saleCurrency = $(v).attr('data-curr');
+        
+        
+        
 
-        /// FIND THE PRICE DIFFERENCE BETWEEN THE BUY/SELL EXCHANGES
-        var fx = parseFloat($('#'+sellCurrency+'_'+buyCurrency+fxSuffix).text());
+        /// WORK OUT THE FEES 
+        var totalFees = 0;
+        if ( $('input#include_trade_fees:checked').length ) {
+           
+           var buyTradeFee = ( parseFloat(item.attr('data-trade-fee')) * (btcBuy * buyPrice) );
+           var sellTradeFee = ( parseFloat($(v).attr('data-trade-fee')) * (btcBuy * salePrice) );  
+           var transferFee = ( parseFloat(item.attr('data-transfer-fee')) * buyPrice );
+           totalFees = (buyTradeFee + sellTradeFee + transferFee);
+           
+        }        
+                
+        /// UPDATE THE SELL PRICE COLUMN
+        $(v).find('.sell_price .price').text(salePrice.toFixed(2));
+        $(v).find('.sell_price .curr').text(saleCurrency);
+
+
+        /// CALCULATE TOTAL OUTPUT 
+        var fx = parseFloat($('#'+saleCurrency+'_'+buyCurrency+fxSuffix).text());        
+        var totalSalePrice = ( (salePrice * btcBuy) - totalFees )
         
+        var fx = parseFloat( $('#'+saleCurrency+'_'+userCurrency+fxSuffix).text() );
+        var totalSalePriceOriginalCurrency = (totalSalePrice * fx)
+        var original = ( totalSalePrice.toFixed(2) + ' ' + saleCurrency)
         
-        var totalSellPrice = (sellPrice * btcBuy)
-        var fx = parseFloat( $('#'+sellCurrency+'_'+userCurrency+fxSuffix).text() );
-        var totalSellPriceOriginalCurrency = (totalSellPrice * fx)
-        
-        
-        var original = ( totalSellPrice.toFixed(2) + ' ' + sellCurrency)
         $(v).find('.total_out').attr('title', original) ;
-        $(v).find('.total_out .price').text(totalSellPriceOriginalCurrency.toFixed(2));
+        $(v).find('.total_out .price').text(totalSalePriceOriginalCurrency.toFixed(2));
         $(v).find('.total_out .curr').text(userCurrency);
         
         
-        
-        var profitLoss = (totalSellPriceOriginalCurrency - userAmount );
+        /// CALCULATE THE PROFIT/LOSS
+        var profitLoss = ((totalSalePriceOriginalCurrency - userAmount));
         $(v).find('.profit_loss .price').text(profitLoss.toFixed(2));
         $(v).find('.profit_loss .curr').text(userCurrency);
         
         
-
+        /// UPDATE THE ROW CLASS ACCORDING TO PROFIT/LOSS
         if (profitLoss < 0) {
              $(v).addClass('red');
              $(v).removeClass('green');
@@ -89,26 +109,28 @@ function highLight(item) {
              $(v).addClass('green');   
         } 
         
-        /// MINIMUM SELL PRICE TO GET A ZERO-SUM
-        var fx = parseFloat( $('#'+buyCurrency+'_'+sellCurrency+fxSuffix).text() );
-        var minSell = ( ( userAmount / btcBuy ) * fx ) ;
         
+        /// CALCULATE MINIMUM SELL PRICE
+        var fx = parseFloat( $('#'+buyCurrency+'_'+saleCurrency+fxSuffix).text() );
+        var minSell = ( ( userAmount / btcBuy ) * fx ) ;
+        $(v).find('.min_sell .price').text(minSell.toFixed(2));
+        $(v).find('.min_sell .curr').text(saleCurrency);
         
                 
-        /// PERCENTAGE
-        var percent = ( (profitLoss / totalSellPriceOriginalCurrency) * 100 ).toFixed(2)
+        /// CALCULATE PERCENTAGE
+        var percent = ( (profitLoss / totalSalePriceOriginalCurrency) * 100 ).toFixed(2)
+        $(v).find('.percent .num').text(percent);
         
-        /// BEST PRICE
-        if (totalSellPriceOriginalCurrency > bestPrice) {
-           bestPrice = totalSellPriceOriginalCurrency ;
+        
+        /// CALCULATE BEST PRICE
+        if (totalSalePriceOriginalCurrency > bestPrice) {
+           bestPrice = totalSalePriceOriginalCurrency ;
            bestPriceEx = '';
            bestPriceEx = $(v).find('.sell_on .name').text();
         }
         
-        /// UPDATE ALL THE DATA IN THE TABLE
-        $(v).find('.percent .num').text(percent);
-        $(v).find('.min_sell .price').text(minSell.toFixed(2));
-        $(v).find('.min_sell .curr').text(sellCurrency);
+        
+        
         
         
          
@@ -186,6 +208,17 @@ $(document).ready( function() {
         highLight( $('.exchange.selected') );
    });
    
+   $('#include_trade_fees').click( function() {
+        highLight( $('.exchange.selected') );
+   });
+   
+   /// HIDE/SHOW THE SETTINGS BOX
+   $('#show_settings').click( function(e) {
+       $(this).toggleClass('selected');
+       $('#settings').toggleClass('visible');
+       e.preventDefault();
+   });
+   
    
    
    
@@ -202,15 +235,13 @@ $(document).ready( function() {
   display: none;   
 }
 
-#user_prefs {
+#in_out {
   float: left;
   width: 100%;
   margin: 0 0 20px 0;
-  border-bottom: 1px solid #fff;
-  padding: 0 0 10px 0;   
 }
 
-#user_prefs #user-amount {
+#in_out #user-amount {
   float: left; 
   margin: 0 5px 0 0;
   background: none;
@@ -223,7 +254,7 @@ $(document).ready( function() {
   height: 45px;  
 }
 
-#user_prefs #radios {
+#in_out #radios {
   float: left;
   width: auto;
   position: relative;
@@ -257,7 +288,42 @@ $(document).ready( function() {
   font-weight: bold;   
 }
 
-#radios label {
+#show_settings {
+    float: left;
+    padding: 5px 10px;
+}
+
+#show_settings.selected {
+  background: #f6f6f6;   
+}
+
+#settings {
+  float: left;
+  width: 96%;
+  margin: 0 0 30px 0;
+  background: #f6f6f6;
+  padding: 10px 2%;
+  display: none;
+}
+
+#settings.visible {
+  display: block;   
+}
+
+#settings div {
+  float: left;
+  margin: 0 20px 0 0;
+  border-right: 1px solid #fff;
+  padding-right: 20px;  
+} 
+
+#settings div h4 {
+  margin: 0 0 5px 0;
+  font-size: 15px; 
+  text-transform: uppercase;  
+}
+
+#radios label, #settings label {
   background: none;
   color: #999;
   padding: 4px 8px 5px;
@@ -274,22 +340,28 @@ $(document).ready( function() {
 
 #radios label.selected, #fx_choice label.selected {
   color: #105D0A;
-  background: #f1f1f1;
+  background: #fff;
   font-weight: bold;
 }
 
 #fx_choice {
  float: left;
- width: 150px;   
+ width: 80px;   
 }
 
-#fx_choice label {
+#settings label {
     color: #999999;
     float: left;
     font-size: 12px;
     font-weight: normal;
+    left: -10px;
     padding: 3px 8px;
+    position: relative;
     width: 75px;
+}
+
+#settings input {
+  margin-right: 10px;   
 }
 
 
@@ -401,7 +473,7 @@ table#list {
 <div class="pure-g-r">
     <div class="pure-u-1">
         
-        <div id="user_prefs">
+        <div id="in_out">
 
             <div id="buy">
                 <span contenteditable="true" id="user-amount">100</span>
@@ -424,10 +496,24 @@ table#list {
                 on <span class="name"></span>
             </div>
             
+            
+        </div>
+        
+        
+        <a href="" id="show_settings"><img src="{% static 'images/settings.png' %}" /></a>
+        <div id="settings">
+        
             <div id="fx_choice">
+                <h4>FX Rates</h4>
                 <label><input type="radio" name="currency_choice" class="" id="real_fx"/>Real World FX</label>
                 <label><input type="radio" name="currency_choice" class="" id="ideal_fx" checked="checked"/>Idealised FX</label>
             </div>
+            
+            <div id="trade_fees">
+                <h4>Trade Fees</h4>
+                <label><input type="checkbox" id="include_trade_fees" checked="checked" />Include Trade Fees</label>
+            </div>
+        
         </div>
         
         
@@ -447,7 +533,7 @@ table#list {
             
             {% for x in buy_data %}
             {% if x.name %}
-                <tr id="{{ x.name }}" class="exchange" data-price="{{ x.price|floatformat:'2' }}" data-curr="{{ x.curr }}">
+                <tr id="{{ x.name }}" class="exchange" data-price="{{ x.price|floatformat:'2' }}" data-curr="{{ x.curr }}" data-trade-fee="{{ x.trade_fee }}" data-transfer-fee="{{ x.transfer_fee }}">
                     <td class="buy_from">
                         
                         <span class="name">{{ x.name }}</span>

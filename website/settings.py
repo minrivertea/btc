@@ -133,7 +133,9 @@ SCRAPE_INTERVAL = 15
 # INFO ABOUT SITES TO SCRAPE
 # --------------------------------------------------------------
 BITCOIN_EXCHANGES = (
-    'MTGOX',
+    'MTGOX (GBP)',
+    'MTGOX (USD)',
+    'MTGOX (EUR)',
     'BITSTAMP',
     'BITTYLICIOUS',
     'BTC-E',
