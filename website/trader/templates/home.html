@@ -20,9 +20,7 @@ function highLight(item) {
     var userAmount = parseFloat($('#user-amount').text());
     var userCurrency = $('input[name="user-currency"]:checked').val();
      
-     
-    console.log(userCurrency)  
-       
+            
     $('#buy #name span').text(item.find('.buy_from').text());
     
     if ( $('#fx_choice input[type="radio"]:checked').attr('id') == 'real_fx' ) {
@@ -35,9 +33,7 @@ function highLight(item) {
     var fx = parseFloat($('#'+userCurrency+'_'+buyCurrency+fxSuffix).text());
     var btcBuy = ( (userAmount * fx) / buyPrice)             
 
-    
-    console.log('BTC Buy = '+btcBuy) 
-        
+            
     item.find('.buy_price .price').text(buyPrice.toFixed(2));
     item.find('.buy_price .curr').text(buyCurrency);
     item.find('.btc_buy').text(btcBuy.toFixed(4));
@@ -83,23 +79,8 @@ function highLight(item) {
         /// CALCULATE TOTAL OUTPUT 
         var fx = parseFloat($('#'+saleCurrency+'_'+buyCurrency+fxSuffix).text());        
         var totalSalePrice = ( (salePrice * btcBuy) - totalFees )
-        
-        
-        console.log($(v).find('.sell_on .name').text()+' '+totalSalePrice);
-        
-        
-        
         var fx = parseFloat( $('#'+saleCurrency+'_'+userCurrency+fxSuffix).text() );
-
-
-        console.log('FX Formula = '+saleCurrency+'_'+userCurrency)
-        console.log(fx)
-        
-
         var totalSalePriceOriginalCurrency = (totalSalePrice * fx)
-        
-        
-        
         var original = ( totalSalePrice.toFixed(2) + ' ' + saleCurrency)
         
         $(v).find('.total_out').attr('title', original) ;
@@ -160,18 +141,12 @@ function highLight(item) {
 $(document).ready( function() {
    
    /// SET/GET GLOBAL VARIABLE FOR FX RATES - REAL WORLD OR IDEAL 
-   $('#fx_choice input[type="radio"]:checked').parent('label').addClass('selected');
    $('#fx_choice input[type="radio"]').click( function() {
        if ( $(this).attr('id') == '#real_fx' ) {
           fxSuffix = '_real';
        } else {
           fxSuffix = '_ideal';
        }
-       
-       $('#fx_choice input[type="radio"]').parent('label').removeClass('selected');
-       $('#fx_choice input[type="radio"]:checked').parent('label').addClass('selected');
-       
-       highLight( $('.exchange.selected') );
    });
       
    
@@ -186,15 +161,6 @@ $(document).ready( function() {
       
       $(this).parent('.exchange').toggleClass('selected');
       highLight( $(this).parent('tr') );     
-   });
-   
-   /// SETUP THE RADIO BUTTONS
-   $('#radios input[type="radio"]:checked').parent('label').addClass('selected');
-   $('#radios input[type="radio"]').click( function() {
-      $('#radios input[type="radio"]').parent('label').removeClass('selected');
-      $('#radios input[type="radio"]:checked').parent('label').addClass('selected');
-      
-      highLight( $('.exchange.selected') );
    });
    
    /// SETUP THE EXCLUDE BUTTON
@@ -221,36 +187,6 @@ $(document).ready( function() {
    $('#user-amount').keyup( function() {    
         highLight( $('.exchange.selected') );
    });
-   
-   
-   /// TRADE FEES BUTTON SETUP
-   $('#trade_fees input[type="radio"]:checked').parent('label').addClass('selected');
-   $('#trade_fees input').click( function() {
-        $('#trade_fees input[type="radio"]').parent('label').removeClass('selected');
-        $('#trade_fees input[type="radio"]:checked').parent('label').addClass('selected');
-        highLight( $('.exchange.selected') );
-   });
-   
-   /// HIDE/SHOW THE SETTINGS BOX
-   $('#show_settings').click( function(e) {
-       $(this).toggleClass('selected');
-       $('#settings').toggleClass('visible');
-       e.preventDefault();
-   });
-   
-   
-    $('.question').hover( function() {
-        
-        
-    
-    });
-    
-    $(".question").hover(function () {
-        var text = $(this).attr('title');
-        $(this).append('<div class="tooltip"><p>'+text+'</p></div>');
-    }, function () {
-        $("div.tooltip").remove();
-    });
    
 
    
@@ -285,10 +221,33 @@ $(document).ready( function() {
 }
 
 #in_out #radios {
-  float: left;
-  width: auto;
-  position: relative;
-  top: 10px;   
+    background: none;
+    float: left;
+    position: relative;
+    overflow: hidden;
+    height: 25px;
+    top: 10px;
+    left: 5px;
+    width: 42px;
+}
+
+#in_out #radios:hover {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border: 1px solid #E1E1E1;
+    border-radius: 4px;
+    float: left;
+    padding: 5px 10px 10px;
+    position: relative;
+    width: 42px;
+    left: -6px;
+    z-index: 20;
+    top: 4px;
+    height: auto;
+    margin-bottom: -68px;
+}
+
+#in_out #radios:hover {
+  overflow: visible;   
 }
 
 #buy {
@@ -318,120 +277,6 @@ $(document).ready( function() {
   font-weight: bold;   
 }
 
-#show_settings {
-    background: none repeat scroll 0 0 #F9F9F9;
-    border-color: #E1E1E1 #E1E1E1 #F9F9F9;
-    border-image: none;
-    border-radius: 4px 4px 0 0;
-    border-style: solid;
-    border-width: 1px 1px 2px;
-    color: #A1A1A1;
-    float: right;
-    font-size: 13px;
-    padding: 5px 10px;
-    position: absolute;
-    right: 0;
-    top: -46px;
-}
-
-#show_settings img {
-  position: relative;
-  top: 2px;
-  opacity: 0.5;
-}
-
-#show_settings.selected img {
-  opacity: 1;
-}
-
-#settings {
-    background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
-    border-bottom: 1px dashed #E1E1E1;
-    display: none;
-    float: left;
-    margin: 0 0 20px;
-    padding: 10px 0 20px;
-    width: 100%;
-}
-
-#settings.visible {
-  display: block;   
-}
-
-#settings div {
-  float: left;
-  margin: 0 20px 0 0;
-  border-right: 1px solid #fff;
-  padding-right: 20px;  
-} 
-
-#settings div:last-child {
-  border-right: none;   
-}
-
-#settings div h4 {
-  margin: 0 0 5px 0;
-  font-size: 15px; 
-  text-transform: uppercase;  
-}
-
-
-
-
-
-#radios label, #settings label, #trade_fees label {
-  background: none;
-  color: #999;
-  padding: 4px 8px 5px;
-  width: auto;
-  margin: 0px 0 0; 
-  font-weight: normal;
-}
-
-#radios label:hover, #fx_choice label:hover, #trade_fees label:hover  {
-  cursor: pointer;
-  background: #f6f6f6;
-  color: #555;   
-}
-
-#radios label.selected, #fx_choice label.selected, #trade_fees label.selected {
-  color: #105D0A;
-  background: #fff;
-  font-weight: bold;
-}
-
-#fx_choice {
- float: left;
- width: 85px;   
-}
-
-#settings label {
-    color: #999999;
-    float: left;
-    font-size: 12px;
-    font-weight: normal;
-    left: -10px;
-    padding: 3px 8px;
-    position: relative;
-    width: 75px;
-}
-
-#settings #trade_fees {
-  width: 100px;   
-}
-
-#settings #trade_fees label {
-  width: 100px;   
-}
-
-#settings input {
-  margin-right: 10px;   
-}
-
-
-#radios input[type="radio"], #fx_choice input[type='radio'], #trade_fees input[type="radio"] {
-  display: none;   
-}
 
 
 
@@ -536,22 +381,7 @@ table#list {
 {% block content %}
         
         
-        <a href="" id="show_settings"><img src="{% static 'images/settings.png' %}" /></a>
-        <div id="settings">
         
-            <div id="fx_choice">
-                <h4>FX Rates <span class="question" title="Real world FX reflects price differences between buy and sell rates; idealised rates exchange equally between either currency.">?</span></h4>
-                <label><input type="radio" name="currency_choice" class="" id="real_fx"/>Real World FX</label>
-                <label><input type="radio" name="currency_choice" class="" id="ideal_fx" checked="checked"/>Idealised FX</label>
-            </div>
-            
-            <div id="trade_fees">
-                <h4>Trade Fees <span class="question" title="Include or exclude estimated trade/transfer fees in the calculations.">?</span></h4>
-                <label><input type="radio" name="trade_fees" id="include_trade_fees" checked="checked" />Include Trade Fees</label>
-                <label><input type="radio" name="trade_fees" id="exclude_trade_fees" checked="checked" />Exclude Trade Fees</label>
-            </div>
-        
-        </div>
         
         
         <div id="in_out">

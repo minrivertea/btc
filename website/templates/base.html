@@ -10,7 +10,7 @@
 	<meta name="DC.type" content="Django Site" />
 	<meta name="robots" content="ALL" />
 	
-	<title>{% block pagetitle %}{% endblock %} | {{ site_name }}</title>
+	<title>{% block pagetitle %}{% endblock %} | ar.bitrage.io</title>
 	<link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
 	
 	{% block canonical %}{% endblock %}
@@ -47,10 +47,29 @@
             <li><a href="{% url 'page' 'about' %}" class="">Pay $15 for 1 month of real time</a></li>
             -->
         </ul>
+        
+        <a href="" id="show_settings"><img src="{% static 'images/settings.png' %}" /></a>
             
     </div>
 </div>
 
+<div class="pure-g-r" id="settings">
+    <div class="pure-u-1 centered">
+        
+            <div id="fx_choice">
+                <h4>FX Rates <span class="question" title="Real world FX reflects price differences between buy and sell rates; idealised rates exchange equally between either currency.">?</span></h4>
+                <label><input type="radio" name="currency_choice" class="" id="real_fx"/>Real World FX</label>
+                <label><input type="radio" name="currency_choice" class="" id="ideal_fx" checked="checked"/>Idealised FX</label>
+            </div>
+            
+            <div id="trade_fees">
+                <h4>Trade Fees <span class="question" title="Include or exclude estimated trade/transfer fees in the calculations.">?</span></h4>
+                <label><input type="radio" name="trade_fees" id="include_trade_fees" checked="checked" />Include Trade Fees</label>
+                <label><input type="radio" name="trade_fees" id="exclude_trade_fees" checked="checked" />Exclude Trade Fees</label>
+            </div>
+        
+    </div>
+</div>
 
 <div id="main" class="pure-g-r centered">
     <div class="pure-u-1">
@@ -67,49 +86,74 @@
 <div id="footer" class="pure-g-r">
        <div class="pure-u-1 centered">
         <ul>
-            <li><a href="">About</a></li>
-            <li><a href="">Contact</a></li>
+            <li>Useful information</li>
+            <li><a href="{% url 'page' 'about' %}">About</a></li>
+            <li><a href="{% url 'page' 'terms-and-conditions' %}">Terms and conditions</a></li>
+            <li><a href="{% url 'page' 'contact' %}">Contact</a></li>
         </ul>
        </div>
     </div>
 
-	{% block extrajs %}{% endblock %}
-	<script type="text/javascript">
+{% block extrajs %}{% endblock %}
+<script type="text/javascript">
 
-		$(document).ready( function() {
+$(document).ready( function() {
 
-			// clear input on focus
-			
-			$('.clearMeFocus').each( function() {
-				if ($(this).val() == '') {
-				    var title = $(this).attr('title');
-				    $(this).val(title);
-				}
-			});
-			
-			$('.clearMeFocus').focus(function()
-			{
-				if($(this).val()==$(this).attr('title'))
-				{
-					$(this).val('');
-					$(this).css('color', '#333');
-				}
-			});
-			
-			// if field is empty afterward, add text again
-			$('.clearMeFocus').blur(function()
-			{
-				if($(this).val()=='')
-				{
-					$(this).val($(this).attr('title'));
-					$(this).css('color', '#999');
-				}
-			});
+	/// CLEAR INPUT ON FOCUS
 		
+	$('.clearMeFocus').each( function() {
+		if ($(this).val() == '') {
+		    var title = $(this).attr('title');
+		    $(this).val(title);
+		}
+	});
+	
+	$('.clearMeFocus').focus(function()
+	{
+		if($(this).val()==$(this).attr('title'))
+		{
+			$(this).val('');
+			$(this).css('color', '#333');
+		}
+	});
+	
+	// if field is empty afterward, add text again
+	$('.clearMeFocus').blur(function()
+	{
+		if($(this).val()=='')
+		{
+			$(this).val($(this).attr('title'));
+			$(this).css('color', '#999');
+		}
+	});
+			
+			
+    /// HIDE/SHOW THE SETTINGS BOX
+    $('#show_settings').click( function(e) {
+        $(this).toggleClass('selected');
+        $('#settings').toggleClass('visible');
+        e.preventDefault();
+    });
+   
+    /// THE QUESTION TOOLTIP
+    $(".question").hover(function () {
+        var text = $(this).attr('title');
+        $(this).append('<div class="tooltip"><p>'+text+'</p></div>');
+    }, function () {
+        $("div.tooltip").remove();
+    });
+    
+    /// TRADE FEES BUTTON SETUP
+    $('#settings input[type="radio"]:checked, #radios input[type="radio"]:checked').parent('label').addClass('selected');
+    $('#settings input, #radios input').click( function() {
+         $('#settings input[type="radio"], #radios input[type="radio"]').parent('label').removeClass('selected');
+         $('#settings input[type="radio"]:checked, #radios input[type="radio"]:checked').parent('label').addClass('selected');
+         highLight( $('.exchange.selected') );
+    });
 		
 		 
 					
-		});
+});
 		
 		
 	</script>

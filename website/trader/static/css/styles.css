@@ -194,16 +194,18 @@ span.percent {
 span.question {
   cursor: pointer;
   display: inline-block;
-  width: 16px;
-  height: 15px;
+  width: 14px;
+  height: 14px;
   background-color: #f5f2da;
   line-height: 16px;
-  color: #555;
-  padding: 2px 0 0 0;
+  color: #7d670d;
+  padding: 1px 0 0 0;
   font-size: 13px;
   font-weight: bold;
   text-align: center;
   position: relative;
+  border: 1px solid #eae6ca;
+  margin-right: -10px;
 }
 
 .tooltip {
@@ -294,17 +296,147 @@ input[type="text"], input[type="email"], textarea {
 
 /* HEADER SPECIFIC */
 
-#toolbar {
-  border-bottom: 1px solid #e1e1e1 ;  /* #4183C4 */
-  box-shadow: 0 1px 0px #fff;
-  position: relative;
-  background: #f6f6f6;    
+#show_settings {
+    background: none repeat scroll 0 0 #F9F9F9;
+    border-color: #E1E1E1 #E1E1E1 #F9F9F9;
+    border-image: none;
+    border-radius: 4px 4px 0 0;
+    border-style: solid;
+    border-width: 1px 1px 2px;
+    color: #A1A1A1;
+    float: right;
+    font-size: 13px;
+    padding: 5px 10px;
+    position: absolute;
+    right: 0;
+    bottom: -12px;
 }
 
-#header {
+#show_settings img {
+  position: relative;
+  top: 2px;
+  opacity: 0.5;
+}
+
+#show_settings.selected {
+  background: #fff;   
+}
+
+#show_settings.selected img {
+  opacity: 1;
+}
+
+#settings {
+    background: none repeat scroll #fff;
+    border-bottom: 1px solid #f1f1f1;
+    display: none;
+    margin: -10px 0 20px;
+    padding: 20px 0 20px;
+    width: 100%;
+    position: relative;
+}
+
+#settings.visible {
+  display: block;   
+}
+
+#settings div > div {
+  float: left;
+  margin: 0 20px 0 0px;
+  border-right: 1px solid #e1e1e1;
+  padding-right: 20px;  
+} 
+
+#settings div > div:last-child {
+  border-right: none;   
+}
+
+#settings div h4 {
+  margin: 0 0 5px 0;
+  font-size: 15px; 
+  text-transform: uppercase;  
+}
+
+
+#settings label, #trade_fees label {
+  background: none;
+  color: #999;
+  padding: 4px 8px 5px;
+  width: auto;
+  margin: 0px 0 0; 
+  font-weight: normal;
+}
+
+#settings label {
+    color: #999999;
+    float: left;
+    font-size: 12px;
+    font-weight: normal;
+    left: -10px;
+    padding: 3px 8px;
+    position: relative;
+    width: 75px;
+}
+
+#settings #trade_fees {
+  width: 100px;   
+}
+
+#settings #trade_fees label {
+  width: 100px;   
+}
+
+#settings input {
+  margin-right: 10px;   
+}
+
+#radios label {
+    color: #999;
+    font-size: 20px;
+    font-weight: bold;
+    padding: 0;
+    position: relative;
+    top: 5px;
+}
+
+#settings label:hover  {
+  cursor: pointer;
+  background: #f6f6f6;
+  color: #555;   
+}
+
+#radios label:hover {
+  color: #555;
+  cursor: pointer;
+}
+
+#radios label.selected, #settings label.selected {
+  color: #105D0A;
+  background: #fff;
+  font-weight: bold;
+}
+
+#radios label.selected {
+  float: left;
+  background: none;
+  width: auto;   
+}
+
+#fx_choice {
+ float: left;
+ width: 85px;   
+}
+
+
+
+#radios input[type="radio"], #settings input[type='radio'] {
+  display: none;   
+}
+
+
+#header, #footer {
   padding: 15px 0 10px; 
   margin: 0 0 10px; 
-  float: ;
   width: 100%;
   border-bottom: 1px solid #e1e1e1 ;  /* #4183C4 */
   box-shadow: 0 1px 0px #fff;
@@ -436,9 +568,9 @@ p.intro, #left p.intro {
 
 /* FOOTER STYLES */
 #footer {
-  background: #fff;
   padding: 20px 0;
-  border-top: 1px solid #f1f1f1;
+  border-top: 1px solid #e1e1e1;
+  box-shadow: 0 -1px 1px #fff;
   width: 100%;
 }
 
@@ -460,12 +592,16 @@ p.intro, #left p.intro {
 }
 
 #footer ul li {
-  float: left;
   margin: 0 25px 0 0;   
 }
 
+#footer ul li:first-child {
+  text-transform: uppercase;
+  color: #333;
+  font-weight: bold;   
+}
+
 #footer ul li a {
-  color: #666;   
 }
 
 #footer ul#social {
