@@ -54,9 +54,9 @@ mixpanel.init("dd5c42fc546d70ffe8771090d82d1f4a");</script>
                 <li><a href="{% url 'page' 'faster-data' %}" class="{% nav_selected request 'faster-data' %}">Get faster data</a></li>
                 <li><a href="{% url 'page' 'get-alerts' %}" class="{% nav_selected request 'get-alerts' %}">Get alerts</a></li>
             {% else %}
-                
+                <li><a href="{% url 'page' 'donate' %}" class="{% nav_selected request 'donate' %}">Donate</a></li>   
             {% endif %}
-            <li><a href="{% url 'page' 'donate' %}" class="{% nav_selected request 'donate' %}">Donate</a></li>
+            
             
             <!--
             <li><a href="{% url 'page' 'about' %}" class="">Signup for better service</a></li>
