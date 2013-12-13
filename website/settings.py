@@ -3,13 +3,14 @@ import os
 PROJECT_PATH = os.path.normpath(os.path.dirname(__file__))
 
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
+ANALYTICS_ON = True
 
 ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
+    ('Chris West', 'chris@minrivertea.com'),
 )
-
+SERVER_EMAIL = 'chris@minrivertea.com'
 MANAGERS = ADMINS
 
 DATABASES = {
@@ -26,10 +27,11 @@ DATABASES = {
 ALLOWED_HOSTS =                     ['btc.westiseast.co.uk', '.bitrage.io']
 TIME_ZONE =                         'Europe/London'
 LANGUAGE_CODE =                     'en-gb'
-SITE_ID = 1
-USE_I18N = True
-USE_L10N = True
-USE_TZ = True
+SITE_ID =                           1
+USE_I18N =                          True
+USE_L10N =                          True
+USE_TZ =                            True
+SITE_URL =                          'http://ar.bitrage.io'
 
 # MEDIA AND STATIC SETTINGS
 # -------------------------------------------------------

@@ -40,6 +40,17 @@ from models import *
 
 # the render shortcut
 def _render(request, template, context_dict=None, **kwargs):
+    
+    # for the AB test
+    ab_paths = ['/faster-data/', '/get-alerts/']
+    if request.path in ab_paths:
+        request.session['AB_TEST_COMPLETE'] = True
+        context_dict['ab_test_complete'] = True
+    
+    try:
+        context_dict['ab_test_complete'] = request.session['AB_TEST_COMPLETE']
+    except:
+        pass
         
     return render_to_response(
         template, context_dict or {}, context_instance=RequestContext(request),

@@ -8,7 +8,6 @@ urlpatterns = patterns('',
 
     url(r'^$', views.home, name="home"),
     url(r'^buy/(\w+)/$', views.buy, name="buy"),
-    url(r'^page/(?P<slug>[\w-]+)/$', views.page, name="page"),
     
     
     # RELATED TO BASKET FUNCTIONS

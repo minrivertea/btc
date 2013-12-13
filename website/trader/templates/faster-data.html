@@ -1,0 +1,47 @@
+{% extends base_template %}
+{% load thumbnail staticfiles mathfilters %}
+
+{% block pagetitle %}About{% endblock %}
+
+
+{% block extrajs %}
+<script type="text/javascript">
+
+$(document).ready( function() {
+    {% if analytics_on %}
+    mixpanel.track(
+        'PRICING-SPLIT-TEST',
+        { 'Item': 'Faster Data' }
+    ); 
+    {% endif %}
+});
+
+</script>
+{% endblock %}
+
+
+{% block extracss %}
+<style type="text/css">
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="pure-g-r">
+    <div class="pure-u-1">
+
+        
+        <p class="extra-large">Thanks, you've been a great guinea pig.</p>
+        
+        
+        <p class="large">Sorry to play around with you - we're just testing at the moment whether users would appreciate faster data, or prefer to get alerts. It looks like you'd prefer faster data, right?</p>
+        
+        <p>At the moment our data is refreshed every {{ settings.SCRAPE_INTERVAL }} minutes, and we're looking to speed this up so you can spot arbitrage opportunties more easily.
+        
+              
+        
+    </div>
+
+</div>
+{% endblock %}

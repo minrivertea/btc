@@ -1,4 +1,4 @@
-{% load staticfiles thumbnail  %}
+{% load staticfiles thumbnail nav_selected %}
 
 <html>
 <head>
@@ -10,7 +10,7 @@
 	<meta name="DC.type" content="Django Site" />
 	<meta name="robots" content="ALL" />
 	
-	<title>{% block pagetitle %}{% endblock %} | ar.bitrage.io</title>
+	<title>{% if not request.path == '/' %}{% block pagetitle %}{% endblock %}{% else %}Bitcoin (BTC) Arbitrage Data and Analytics{% endif %} | ar.bitrage.io</title>
 	<link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
 	
 	{% block canonical %}{% endblock %}
@@ -28,6 +28,14 @@
 	{% endif %}
 	   
 	{% block extracss %}{% endblock %}
+	
+	<!-- start Mixpanel -->
+	<script type="text/javascript">(function(e,b){if(!b.__SV){var a,f,i,g;window.mixpanel=b;a=e.createElement("script");a.type="text/javascript";a.async=!0;a.src=("https:"===e.location.protocol?"https:":"http:")+'//cdn.mxpnl.com/libs/mixpanel-2.2.min.js';f=e.getElementsByTagName("script")[0];f.parentNode.insertBefore(a,f);b._i=[];b.init=function(a,e,d){function f(b,h){var a=h.split(".");2==a.length&&(b=b[a[0]],h=a[1]);b[h]=function(){b.push([h].concat(Array.prototype.slice.call(arguments,0)))}}var c=b;"undefined"!==
+typeof d?c=b[d]=[]:d="mixpanel";c.people=c.people||[];c.toString=function(b){var a="mixpanel";"mixpanel"!==d&&(a+="."+d);b||(a+=" (stub)");return a};c.people.toString=function(){return c.toString(1)+".people (stub)"};i="disable track track_pageview track_links track_forms register register_once alias unregister identify name_tag set_config people.set people.set_once people.increment people.append people.track_charge people.clear_charges people.delete_user".split(" ");for(g=0;g<i.length;g++)f(c,i[g]);
+b._i.push([a,e,d])};b.__SV=1.2}})(document,window.mixpanel||[]);
+mixpanel.init("dd5c42fc546d70ffe8771090d82d1f4a");</script>
+    <!-- end Mixpanel -->
+	
 		
 </head>
 
@@ -41,12 +49,21 @@
         <h1><a href="{% url 'home' %}">ar<span>bit</span>rage</a></h1>
         
         <ul>
-            <li><a href="{% url 'page' 'about' %}">About</a></li>
+            <li><a href="{% url 'page' 'how-it-works' %}" class="{% nav_selected request 'how-it-works' %}">How It Works</a></li>
+            {% if not ab_test_complete %}
+                <li><a href="{% url 'page' 'faster-data' %}" class="{% nav_selected request 'faster-data' %}">Get faster data</a></li>
+                <li><a href="{% url 'page' 'get-alerts' %}" class="{% nav_selected request 'get-alerts' %}">Get alerts</a></li>
+            {% else %}
+                
+            {% endif %}
+            <li><a href="{% url 'page' 'donate' %}" class="{% nav_selected request 'donate' %}">Donate</a></li>
+            
             <!--
             <li><a href="{% url 'page' 'about' %}" class="">Signup for better service</a></li>
             <li><a href="{% url 'page' 'about' %}" class="">Pay $15 for 1 month of real time</a></li>
             -->
         </ul>
+        
         
         <a href="" id="show_settings"><img src="{% static 'images/settings.png' %}" /></a>
             
@@ -85,12 +102,22 @@
 
 <div id="footer" class="pure-g-r">
        <div class="pure-u-1 centered">
-        <ul>
-            <li>Useful information</li>
-            <li><a href="{% url 'page' 'about' %}">About</a></li>
-            <li><a href="{% url 'page' 'terms-and-conditions' %}">Terms and conditions</a></li>
-            <li><a href="{% url 'page' 'contact' %}">Contact</a></li>
-        </ul>
+        
+            <ul id="links">
+                <li>Useful information</li>
+                <li><a href="{% url 'page' 'about' %}">About</a></li>
+                <li><a href="{% url 'page' 'terms-and-conditions' %}">Terms and conditions</a></li>
+                <li><a href="{% url 'page' 'contact' %}">Contact</a></li>
+            </ul>
+            
+            <div id="share">
+                <a href="http://www.facebook.com/sharer/sharer.php?s=100&p[url]=http://ar.bitrage.io&p[images][0]=&p[title]=Bitcoin%20Arbitrage%20Data%20and%20Analytics&p[summary]=">Share on Facebook</a>
+                         |    
+                <a href="https://plus.google.com/share?url=http://ar.bitrage.io">Share on Google+</a>
+   | 
+   <a href="http://twitter.com/home?status=Try%20http://ar.bitrage.io%20for%20data%20and%20analytics%20of%20Bitcoin%20arbitrage">Share on Twitter</a>
+            </div>
+            
        </div>
     </div>
 
@@ -150,6 +177,14 @@ $(document).ready( function() {
          $('#settings input[type="radio"]:checked, #radios input[type="radio"]:checked').parent('label').addClass('selected');
          highLight( $('.exchange.selected') );
     });
+    
+    
+    
+    /// TRACK A RAW PAGE VIEW
+    mixpanel.track(
+        'PageView',
+        { 'URL': '{{ request.path }}' }
+    );
 		
 		 
 					

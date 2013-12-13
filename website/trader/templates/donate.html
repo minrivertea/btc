@@ -1,0 +1,49 @@
+{% extends base_template %}
+{% load staticfiles %}
+
+{% block pagetitle %}Donate{% endblock %}
+
+
+{% block extrajs %}
+<script type="text/javascript">
+
+$(document).ready( function() {
+    {% if analytics_on %}
+    mixpanel.track(
+        'PRICING-SPLIT-TEST',
+        { 'Item': 'Donate' }
+    ); 
+    {% endif %}
+});
+
+</script>
+{% endblock %}
+
+
+{% block extracss %}
+<style type="text/css">
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="pure-g-r">
+    <div class="pure-u-1">
+
+        
+        <p class="extra-large">Donations are welcome!</p>
+        
+        <p class="large">If you've made a profit from your Bitcoin trading and want to say thanks and help keep this site running and improving, donations are greatly appreciated.</p>
+        
+        <div class="pure-g-r">
+        <p class="pure-u-1-2"><strong>Make a cash donation</strong><br/>If you want to make a cash donation, please click here to pay via Paypal. There's no minimum donation, and you can use your linked account or most major credit/debit cards.</p>
+        
+        <p class="pure-u-1-2"><strong>Use BTC to make a donation</strong><br/>Of course, you can donate Bitcoins (BTC) if you really want! Send any donations to XXXBITCOINADDRESSXXX</p>
+        
+              
+        
+    </div>
+
+</div>
+{% endblock %}

@@ -1,7 +1,7 @@
 {% extends base_template %}
 {% load thumbnail staticfiles mathfilters %}
 
-{% block pagetitle %}Home{% endblock %}
+{% block pagetitle %}{% endblock %}
 
 
 {% block extrajs %}
@@ -228,7 +228,7 @@ $(document).ready( function() {
     height: 25px;
     top: 10px;
     left: 5px;
-    width: 42px;
+    width: auto;
 }
 
 #in_out #radios:hover {
@@ -238,7 +238,6 @@ $(document).ready( function() {
     float: left;
     padding: 5px 10px 10px;
     position: relative;
-    width: 42px;
     left: -6px;
     z-index: 20;
     top: 4px;
@@ -248,6 +247,10 @@ $(document).ready( function() {
 
 #in_out #radios:hover {
   overflow: visible;   
+}
+
+#show_settings {
+  display: inline-block;   
 }
 
 #buy {
