@@ -253,6 +253,8 @@ span.question {
     z-index: 2;
 }
 
+
+
 /* END TYPOGRAPHY */
 
 /* FORMS */
@@ -302,6 +304,14 @@ input[type="text"], input[type="email"], textarea {
 }
 
 /* HEADER SPECIFIC */
+
+#data_refresh {
+  float: right;
+  bottom: 0px;
+  font-size: 11px;
+  position: absolute;
+  right: 60px;   
+}
 
 #show_settings {
     background: none repeat scroll 0 0 #F9F9F9;

@@ -1,0 +1,33 @@
+{% extends base_template %}
+{% load thumbnail staticfiles mathfilters %}
+
+{% block pagetitle %}Contact{% endblock %}
+
+
+{% block extrajs %}
+<script type="text/javascript">
+</script>
+{% endblock %}
+
+
+{% block extracss %}
+<style type="text/css">
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="pure-g-r">
+    <div class="pure-u-1">
+
+        
+        <p class="extra-large">Sorry, we can't find the page you're looking for.</p>
+        
+        <p class="large">It might have been moved, you clicked on a broken link, or perhaps you typed the URL incorrectly. Please navigate back to the <a href="{% url 'home' %}">homepage</a> and try find the information you're looking for again.</p>               
+             
+        
+    </div>
+
+</div>
+{% endblock %}

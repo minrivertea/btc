@@ -1,0 +1,58 @@
+{% extends base_template %}
+{% load thumbnail staticfiles mathfilters %}
+
+{% block pagetitle %}Contact{% endblock %}
+
+
+{% block extrajs %}
+<script type="text/javascript">
+</script>
+{% endblock %}
+
+
+{% block extracss %}
+<style type="text/css">
+#facebook_button {
+  position: relative;
+  top: -20px;   
+}
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<div class="pure-g-r">
+    <div class="pure-u-1">
+
+        
+        <p class="extra-large">More information about ar.bitrage.io</p>
+        
+        
+        <p class="large">This site was built in 2013 by Chris West as a tool to help his own BTC trading. It's now publicly available to help others do the same. If you're looking for information about how to use this site, <a href="{% url 'page' 'how-it-works' %}">check out the introduction</a>. </p>
+        
+        <div id="facebook_button">
+        <div class="fb-like" data-href="http://ar.bitrage.io" data-layout="box_count" data-action="recommend" data-show-faces="false" data-share="false"></div>
+        </div>
+                
+        <div class="pure-g-r">
+            <p class="pure-u-1-3"><strong>Technology stack</strong><br/>For anyone interested, this site uses a mix of Django, Redis, served by Nginx/uWsgi.</p>
+            <p class="pure-u-1-3"><strong>About the founder</strong><br/>Chris West is a technologist and <a href="http://www.minrivertea.com">tea-entrepreneur</a> living in China and originally from London, UK.</p>
+            <p class="pure-u-1-3"><strong>Contact</strong><br/>Feel free to get in touch about anything related to this site. Visit our <a href="{% url 'page' 'contact' %}">contact page</a> for details.</p>
+        
+        </div>
+             
+        
+    </div>
+
+</div>
+{% endblock %}

@@ -129,7 +129,7 @@ CACHES = {
 # REDIS STUFF
 # --------------------------------------------------------------
 REDIS_DB_ID = 9
-SCRAPE_INTERVAL = 15
+SCRAPE_INTERVAL = 10
 
 
 # INFO ABOUT SITES TO SCRAPE
