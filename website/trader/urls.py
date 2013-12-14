@@ -7,7 +7,6 @@ import views
 urlpatterns = patterns('',
 
     url(r'^$', views.home, name="home"),
-    url(r'^buy/(\w+)/$', views.buy, name="buy"),
     
     
     # RELATED TO BASKET FUNCTIONS

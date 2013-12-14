@@ -98,11 +98,12 @@ class Command(NoArgsCommand):
             j = simplejson.loads(r.content)
             mapping = {}
             mapping['name'] = 'Bittylicious'
+            mapping['parent'] = site
             mapping['url'] = 'http://www.bittylicious.com'
             mapping['price'] = '%.2f' % float(j['totalPrice'])
             mapping['curr'] = 'GBP'
-            mapping['trade_fee'] = '0.01' # this is a percent
-            mapping['transfer_fee'] = '0' # this is a BTC
+            mapping['trade_fee'] = '0.01' 
+            mapping['transfer_fee'] = '0' 
             key = "%s:%s" % (base_key, site)
             _add_to_redis(key, mapping)
         except JSONDecodeError:
@@ -116,11 +117,12 @@ class Command(NoArgsCommand):
             j = simplejson.loads(r.content)
             mapping = {}
             mapping['name'] = site
+            mapping['parent'] = site
             mapping['url'] = 'http://www.bitstamp.net'
             mapping['price'] = '%.2f' % float(j['last'])
             mapping['curr'] = 'USD'
-            mapping['trade_fee'] = '0' # this is a percent
-            mapping['transfer_fee'] = '0.001' # this is a BTC
+            mapping['trade_fee'] = '0.005' 
+            mapping['transfer_fee'] = '0.001' 
             key = "%s:%s" % (base_key, site)
             _add_to_redis(key, mapping)
         except:
@@ -133,11 +135,12 @@ class Command(NoArgsCommand):
             j = simplejson.loads(r.content)
             mapping = {}
             mapping['name'] = site
+            mapping['parent'] = site
             mapping['url'] = 'http://www.btc-e.com'
             mapping['price'] = '%.2f' % float(j['ticker']['last'])
             mapping['curr'] = 'USD'
-            mapping['trade_fee'] = '0' # this is a percent
-            mapping['transfer_fee'] = '0.001' # this is a BTC
+            mapping['trade_fee'] = '0.005' 
+            mapping['transfer_fee'] = '0.001'
             key = "%s:%s" % (base_key, site)
             _add_to_redis(key, mapping)
         except:
@@ -155,11 +158,12 @@ class Command(NoArgsCommand):
                 count += 1
             mapping = {}
             mapping['name'] = site
+            mapping['parent'] = site
             mapping['url'] = 'http://www.btcclubs.com'
             mapping['price'] = "%.2f" % float(total/count)
             mapping['curr'] = 'RMB'
-            mapping['trade_fee'] = '0' # this is a percent
-            mapping['transfer_fee'] = '0.001' # this is a BTC
+            mapping['trade_fee'] = '0'
+            mapping['transfer_fee'] = '0'
             key = "%s:%s" % (base_key, site)
             _add_to_redis(key, mapping)
             
@@ -174,11 +178,12 @@ class Command(NoArgsCommand):
             j = simplejson.loads(content)
             mapping = {}
             mapping['name'] = site
+            mapping['parent'] = site
             mapping['url'] = "http://www.huobi.com"
             mapping['price'] = j['sells'][0]['price']
             mapping['curr'] = 'RMB'
             mapping['trade_fee'] = '0' # this is a percent
-            mapping['transfer_fee'] = '0.001' # this is a BTC
+            mapping['transfer_fee'] = '0' # this is a BTC
             key = "%s:%s" % (base_key, site)
             _add_to_redis(key, mapping)
         except:
@@ -192,11 +197,12 @@ class Command(NoArgsCommand):
             j = simplejson.loads(r.content)
             mapping = {}
             mapping['name'] = site
+            mapping['parent'] = site
             mapping['url'] = 'http://www.chbtc.com'
             mapping['price'] = "%.2f" % float(j['ticker']['sell'])
             mapping['curr'] = 'RMB'
             mapping['trade_fee'] = '0' # this is a percent
-            mapping['transfer_fee'] = '0.001' # this is a BTC
+            mapping['transfer_fee'] = '0' # this is a BTC
             key = "%s:%s" % (base_key, site)
             _add_to_redis(key, mapping)
         except:
@@ -209,11 +215,12 @@ class Command(NoArgsCommand):
             j = simplejson.loads(r.content)
             mapping = {}
             mapping['name'] = site
+            mapping['parent'] = site
             mapping['url'] = 'http://www.btcchina.com'
             mapping['price'] = "%.2f" % float(j['ticker']['sell'])
             mapping['curr'] = 'RMB'
             mapping['trade_fee'] = '0' # this is a percent
-            mapping['transfer_fee'] = '0.001' # this is a BTC
+            mapping['transfer_fee'] = '0' # this is a BTC
             key = "%s:%s" % (base_key, site)
             _add_to_redis(key, mapping)
         except:
@@ -227,11 +234,12 @@ class Command(NoArgsCommand):
             j = simplejson.loads(r.content)
             mapping = {}
             mapping['name'] = site
+            mapping['parent'] = site
             mapping['url'] = 'https://796.com'
             mapping['price'] = "%.2f" % float(j['return']['last'])
             mapping['curr'] = 'USD'
-            mapping['trade_fee'] = '0' # this is a percent
-            mapping['transfer_fee'] = '0.001' # this is a BTC
+            mapping['trade_fee'] = '0.0025' 
+            mapping['transfer_fee'] = '0.001' 
             key = "%s:%s" % (base_key, site)
             _add_to_redis(key, mapping)
         except:
@@ -244,6 +252,7 @@ class Command(NoArgsCommand):
             j = simplejson.loads(r.content.strip())
             mapping = {}
             mapping['name'] = site
+            mapping['parent'] = site
             mapping['url'] = 'https://www.btc38.com'
             
             count = 0
@@ -254,8 +263,8 @@ class Command(NoArgsCommand):
             
             mapping['price'] = "%.2f" % float(total/count)
             mapping['curr'] = 'RMB'
-            mapping['trade_fee'] = '0' # this is a percent
-            mapping['transfer_fee'] = '0.001' # this is a BTC
+            mapping['trade_fee'] = '0.001' # this is a percent
+            mapping['transfer_fee'] = '0' # this is a BTC
             key = "%s:%s" % (base_key, site)
             _add_to_redis(key, mapping)
         except JSONDecodeError:
@@ -271,11 +280,12 @@ class Command(NoArgsCommand):
             j = simplejson.loads(r.content.strip())
             mapping = {}
             mapping['name'] = site
+            mapping['parent'] = site
             mapping['url'] = 'https://www.bter.com'
             mapping['price'] = "%.2f" % float(j['avg'])
             mapping['curr'] = 'RMB'
             mapping['trade_fee'] = '0' # this is a percent
-            mapping['transfer_fee'] = '0.001' # this is a BTC
+            mapping['transfer_fee'] = '0' # this is a BTC
             key = "%s:%s" % (base_key, site)
             _add_to_redis(key, mapping)
         except JSONDecodeError:
@@ -290,11 +300,12 @@ class Command(NoArgsCommand):
             j = simplejson.loads(r.content.strip())
             mapping = {}
             mapping['name'] = site
+            mapping['parent'] = site
             mapping['url'] = 'https://www.okcoin.com'
             mapping['price'] = "%.2f" % float(j['ticker']['buy'])
             mapping['curr'] = 'RMB'
             mapping['trade_fee'] = '0' # this is a percent
-            mapping['transfer_fee'] = '0.001' # this is a BTC
+            mapping['transfer_fee'] = '0' # this is a BTC
             key = "%s:%s" % (base_key, site)
             _add_to_redis(key, mapping)
         except JSONDecodeError:
@@ -308,10 +319,11 @@ class Command(NoArgsCommand):
             j = simplejson.loads(r.content.strip())
             mapping = {}
             mapping['name'] = site
+            mapping['parent'] = site
             mapping['url'] = 'https://www.fxbtc.com'
             mapping['price'] = "%.2f" % float(j['ticker']['last_rate'])
             mapping['curr'] = 'RMB'
-            mapping['trade_fee'] = '0' # this is a percent
+            mapping['trade_fee'] = '0.002' # this is a percent
             mapping['transfer_fee'] = '0.001' # this is a BTC
             key = "%s:%s" % (base_key, site)
             _add_to_redis(key, mapping)
@@ -332,11 +344,12 @@ class Command(NoArgsCommand):
             j = simplejson.loads(r.content.strip())
             mapping = {}
             mapping['name'] = site
+            mapping['parent'] = site
             mapping['url'] = 'https://www.rmbtb.com'
             mapping['price'] = "%.2f" % float(j['ticker']['buy'])
             mapping['curr'] = 'RMB'
             mapping['trade_fee'] = '0' # this is a percent
-            mapping['transfer_fee'] = '0.001' # this is a BTC
+            mapping['transfer_fee'] = '0' # this is a BTC
             key = "%s:%s" % (base_key, site)
             _add_to_redis(key, mapping)
         

@@ -188,7 +188,36 @@ $(document).ready( function() {
         highLight( $('.exchange.selected') );
    });
    
-
+    /// DOES THE AUTO REFRESH OF DATA
+    setInterval(function() {
+        
+        $.ajax( {
+            url: '{% url "refresh_exchanges" %}',
+            dataType: 'JSON',
+            success: function (data) {
+               
+               /// UPDATE THE DATA-PRICE OF EACH ROW
+               $(data).each( function(k,v) {
+                  if ( v != null ) {
+                     
+                      var attr = $('#list').find('#'+v.parent).attr('data-curr');
+                      if (typeof attr !== 'undefined' && attr !== false) {
+                        $(this).attr('data-price', v.price);
+                      }
+                  
+                  }
+                  
+                });
+                              
+               /// NOW JUST RE-RUN THE HIGHLIGHT FUNCTION
+               highLight($('.exchange.selected'));
+                 
+            }
+               
+        });
+        
+    }, 10000);  /// INTERVAL SET AT 10 SECONDS
+   
    
 });
 </script>
@@ -392,7 +421,7 @@ table#list {
             <div id="buy">
                 <span contenteditable="true" id="user-amount">100</span>
     
-                <div id="radios">
+                <div id="radios" class="radios">
                     <label><input type="radio" name="user-currency" checked="checked" value="GBP">GBP</label>
                     <label><input type="radio" name="user-currency" value="USD">USD</label>
                     <label><input type="radio" name="user-currency" value="EUR">EUR</label>
@@ -432,7 +461,7 @@ table#list {
             
             {% for x in buy_data %}
             {% if x.name %}
-                <tr id="{{ x.name }}" class="exchange" data-price="{{ x.price|floatformat:'2' }}" data-curr="{{ x.curr }}" data-trade-fee="{{ x.trade_fee }}" data-transfer-fee="{{ x.transfer_fee }}">
+                <tr id="{% if x.parent %}{{ x.parent }}{% else %}{{ x.name }}{% endif %}" class="exchange" data-price="{{ x.price|floatformat:'2' }}" data-curr="{{ x.curr }}" data-trade-fee="{{ x.trade_fee }}" data-transfer-fee="{{ x.transfer_fee }}">
                     <td class="buy_from">
                         <span class="name">{{ x.name }}</span>
                     </td>

@@ -140,6 +140,13 @@ body, .pure-g-r, .pure-g-r [class*="pure-u"] {
   font-family: "Myriad Pro",Helvetica Neue,Helvetica,Arial,sans-serif;
 }
 
+code, kbd, pre, samp {
+    background: none repeat scroll 0 0 #FFFFFF;
+    border: 1px solid #E1E1E1;
+    margin: 0 0 0 -7px;
+    padding: 4px 7px;
+}
+
 h1 {
     font-size: 44px;
     font-weight: 100;
@@ -339,6 +346,22 @@ input[type="text"], input[type="email"], textarea {
 
 #settings.visible {
   display: block;   
+}
+
+#settings .warnings {
+    background: none repeat scroll 0 0 #F8DBDB;
+    color: #801e1e;
+    border: 1px solid #E9B2B2;
+    font-size: 13px;
+    margin: 10px 0 0;
+    padding: 5px 1% 3px;
+    width: 98%;
+    display: none;
+}
+
+#settings .warnings p {
+  margin: 0;
+  padding: 0;   
 }
 
 #settings div > div {
@@ -623,8 +646,11 @@ p.intro, #left p.intro {
 }
 
 #footer #share a {
-  padding: 0 5px 0;   
+    padding: 0 5px;
 }
+
+
+
 
 
 /* END FOOTER STYLES

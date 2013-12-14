@@ -11,7 +11,10 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     (r'^', include('website.trader.urls')),
+    url(r'^api/', include('website.api.urls')),
     url(r'^admin/', include(admin.site.urls)),
+    
+    
     
     url(r'^(?P<slug>[\w-]+)/$', trader_views.page, name="page"),
     
