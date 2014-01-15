@@ -109,7 +109,7 @@ a:focus, a:active {
 }
 
 .green {
-  color: #105D0A;   
+  color: #105D0A; 
 }
 
 .small {
@@ -409,15 +409,20 @@ input[type="text"], input[type="email"], textarea {
     left: -10px;
     padding: 3px 8px;
     position: relative;
-    width: 75px;
+    width: 100%;
 }
 
 #settings #trade_fees {
   width: 100px;   
 }
 
-#settings #trade_fees label {
-  width: 100px;   
+
+#settings #simplify {
+  width: 80px;   
+}
+
+#settings #hide_losers {
+  width: 90px;   
 }
 
 #settings input {

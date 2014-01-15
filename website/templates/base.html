@@ -81,10 +81,27 @@ mixpanel.init("dd5c42fc546d70ffe8771090d82d1f4a");</script>
                 <label><input type="radio" name="currency_choice" class="" id="ideal_fx" checked="checked"/>Idealised FX</label>
             </div>
             
+            
+            
             <div id="trade_fees" class="radios">
                 <h4>Trade Fees <span class="question" title="Include or exclude estimated trade/transfer fees in the calculations.">?</span></h4>
                 <label><input type="radio" name="trade_fees" id="include_trade_fees" checked="checked" />Include Trade Fees</label>
                 <label><input type="radio" name="trade_fees" id="exclude_trade_fees" />Exclude Trade Fees</label>
+            </div>
+            
+            
+            
+            <div id="simplify" class="radios">
+                <h4>Simplify it</h4>
+                <label><input name="simplify" type="radio" id="simple" checked="checked" />Simple data</label>
+                <label><input name="simplify" type="radio" id="full" />Full data</label>
+            </div>
+            
+            
+            <div id="hide_losers" class="radios">
+                <h4>Hide losers</h4>
+                <label><input name="losers" type="radio" id="hide" checked="checked" />Hide losers</label>
+                <label><input name="losers" type="radio" id="show" />Show all</label>
             </div>
             
             <div class="warnings"></div>

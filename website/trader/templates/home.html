@@ -21,7 +21,7 @@ function highLight(item) {
     var userCurrency = $('input[name="user-currency"]:checked').val();
      
             
-    $('#buy #name span').text(item.find('.buy_from').text());
+    $('#buy #name span').text(item.find('.buy_from .name').text());
     
     if ( $('#fx_choice input[type="radio"]:checked').attr('id') == 'real_fx' ) {
         var fxSuffix = '_real';
@@ -199,26 +199,73 @@ $(document).ready( function() {
                /// UPDATE THE DATA-PRICE OF EACH ROW
                $(data).each( function(k,v) {
                   if ( v != null ) {
-                     
-                      var attr = $('#list').find('#'+v.parent).attr('data-curr');
+                      var attr = $('#list').find('[data-name="'+v.parent+'"]').attr('data-curr');
                       if (typeof attr !== 'undefined' && attr !== false) {
                         $(this).attr('data-price', v.price);
                       }
-                  
                   }
-                  
                 });
-                              
                /// NOW JUST RE-RUN THE HIGHLIGHT FUNCTION
                highLight($('.exchange.selected'));
-                 
             }
-               
         });
-        
     }, 10000);  /// INTERVAL SET AT 10 SECONDS
    
-   
+
+    /// GROUP TOGETHER SAME EXCHANGES
+    $('tr.exchange').each( function() {       
+        var items = $('.exchange[data-name="'+$(this).attr('data-name')+'"]');        
+        if ( items.size() > 1 ) {
+            items.first().addClass('parent');
+            $(this).siblings('.exchange[data-name="'+$(this).attr('data-name')+'"]').not('.parent').addClass('child');
+        }
+    });
+    
+    $('.exchange.child').addClass('collapsed');
+    $('.exchange .collapse').click( function(e) {
+            
+        var parentID = $(this).parents('tr.exchange').attr('data-name');
+        var siblings = $(this).parents('tr.exchange').siblings('.exchange[data-name="'+parentID+'"]');
+        $(siblings).toggleClass('collapsed')
+        if ( $(this).hasClass('expanded') ) {
+            $(siblings).hide();
+            $(this).removeClass('expanded');   
+        } else {
+            $(siblings).show();
+            $(this).addClass('expanded');
+        }
+        e.preventDefault();
+        e.stopPropagation();   
+    });
+    
+    
+    /// SIMPLE OR FULL INTERFACE
+    if ( $('#simplify input#simple:checked') ) {
+        $('#list').addClass('simple');   
+    }
+    $('#simplify input').click( function() {
+                        
+        if ( $(this).attr('id') == 'simple' ) {
+            $('#list').addClass('simple'); 
+        } else {
+            $('#list').removeClass('simple');
+        }
+    });
+    
+    /// SHOW/HIDE LOSERS
+    if ( $('#hide_losers input#hide:checked').length ) {
+        $('#list .exchange.red').not('.collapsed').hide();   
+    }
+    $('#hide_losers input').click( function() {
+       
+        if ( $('#hide_losers input#hide:checked').length ) {
+            $('#list .exchange.red').not('.collapsed').hide();
+        } else {
+            $('#list .exchange.red').not('.collapsed').show();
+        }
+        
+    });
+       
 });
 </script>
 {% endblock %}
@@ -309,14 +356,46 @@ $(document).ready( function() {
   font-weight: bold;   
 }
 
-
-
-
 table#list {
   float: left;
   font-size: 13px;
   background: none;
   width: 100%; 
+}
+
+#list.simple {
+  width: auto;   
+}
+
+#list.simple .sell_price, #list.simple .total_out, #list.simple .min_sell, #list.simple .percent {
+  display: none;   
+}
+
+#list .exchange .collapse {
+    background: none repeat scroll 0 0 #E1E1E1;
+    border-radius: 3px;
+    display: none;
+    height: 15px;
+    left: -20px;
+    padding: 0;
+    position: absolute;
+    text-align: center;
+    width: 15px;
+    color: #555;
+}
+
+#list .exchange.parent .collapse {
+  display: inline-block;   
+}
+
+#list .exchange.child.collapsed {
+  display: none;
+}
+
+#list .exchange.child .buy_from .name {
+  position: relative;
+  left: 20px;
+  font-size: 11px;
 }
 
 #list td {
@@ -339,7 +418,7 @@ table#list {
     border-radius: 10px;
     float: left;
     height: 20px;
-    left: 310px;
+    left: 285px;
     margin-top: -3px;
     padding: 0;
     position: absolute;
@@ -369,7 +448,8 @@ table#list {
 
 #list .buy_from {
   background: none;
-  color: #999;   
+  color: #999;
+  text-transform: uppercase;   
 }
 
 #list .buy_from:hover {
@@ -452,17 +532,18 @@ table#list {
                 <td>Price</td>
                 <td>BTC Buy</td>
                 <td>Sell on</td>
-                <td class="num">Sell price</td>
-                <td class="num">Total out</td>
-                <td class="num">+ / -</td>
-                <td class="num">Percent</td>
-                <td class="num">Min-sell</td>
+                <td class="sell_price num">Sell price</td>
+                <td class="total_out num">Total out</td>
+                <td class="profit_loss num">+ / -</td>
+                <td class="percent num">Percent</td>
+                <td class="min_sell num">Min-sell</td>
             </thead>
             
             {% for x in buy_data %}
             {% if x.name %}
-                <tr id="{% if x.parent %}{{ x.parent }}{% else %}{{ x.name }}{% endif %}" class="exchange" data-price="{{ x.price|floatformat:'2' }}" data-curr="{{ x.curr }}" data-trade-fee="{{ x.trade_fee }}" data-transfer-fee="{{ x.transfer_fee }}">
+                <tr id="{{ forloop.count }}" class="exchange" data-price="{{ x.price|floatformat:'2' }}" data-name="{% if x.parent %}{{ x.parent }}{% else %}{{ x.name }}{% endif %}" data-curr="{{ x.curr }}" data-trade-fee="{{ x.trade_fee }}" data-transfer-fee="{{ x.transfer_fee }}">
                     <td class="buy_from">
+                        <a href="" class="collapse">+</a>
                         <span class="name">{{ x.name }}</span>
                     </td>
                     <td class="buy_price">

@@ -15,7 +15,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 
 # APP
-from website.redis_helper import _get_redis, _add_to_redis, _search_redis
+from website.redis_helper import _get_redis, _add_to_redis, _search_redis, cleanup
 
 
 
@@ -37,8 +37,9 @@ class Command(NoArgsCommand):
         
         site = 'MTGOX (GBP)'
         try:
-            r = requests.get('https://data.mtgox.com/api/2/BTCGBP/money/ticker_fast')
-            j = simplejson.loads(r.content)    
+            r = requests.get('https://data.mtgox.com/api/2/BTCGBP/money/ticker_fast', verify=False)
+            j = simplejson.loads(r.content) 
+            s = requests.session(config={'keep_alive': False})   
             mapping = {}
             mapping['name'] = site
             mapping['parent'] = 'MTGOX'
@@ -49,14 +50,16 @@ class Command(NoArgsCommand):
             mapping['transfer_fee'] = '0.001' # this is a BTC
             key = "%s:%s" % (base_key, site)
             _add_to_redis(key, mapping)
+            
         except JSONDecodeError:
             print "Failed to add %s prices (JSONDecodeError)" % site
         
         
         site = 'MTGOX (USD)'
         try:
-            r = requests.get('https://data.mtgox.com/api/2/BTCUSD/money/ticker_fast')
-            j = simplejson.loads(r.content)    
+            r = requests.get('https://data.mtgox.com/api/2/BTCUSD/money/ticker_fast', verify=False)
+            j = simplejson.loads(r.content)  
+            s = requests.session(config={'keep_alive': False})  
             mapping = {}
             mapping['name'] = site
             mapping['parent'] = 'MTGOX'
@@ -74,8 +77,9 @@ class Command(NoArgsCommand):
          
         site = 'MTGOX (EUR)'
         try:
-            r = requests.get('https://data.mtgox.com/api/2/BTCEUR/money/ticker_fast')
-            j = simplejson.loads(r.content)    
+            r = requests.get('https://data.mtgox.com/api/2/BTCEUR/money/ticker_fast', verify=False)
+            j = simplejson.loads(r.content)
+            s = requests.session(config={'keep_alive': False})    
             mapping = {}
             mapping['name'] = site
             mapping['parent'] = 'MTGOX'
@@ -94,8 +98,9 @@ class Command(NoArgsCommand):
         site = 'BITTYLICIOUS'
         try:
             # BITTYLICIOUS (ALWAYS GBP)
-            r = requests.get('https://bittylicious.com/api/v1/quote/BTC/GB/GBP/BANK/1')
+            r = requests.get('https://bittylicious.com/api/v1/quote/BTC/GB/GBP/BANK/1', verify=False)
             j = simplejson.loads(r.content)
+            s = requests.session(config={'keep_alive': False})
             mapping = {}
             mapping['name'] = 'Bittylicious'
             mapping['parent'] = site
@@ -113,8 +118,9 @@ class Command(NoArgsCommand):
             
         site = "BITSTAMP"            
         try:    
-            r = requests.get('https://www.bitstamp.net/api/ticker/')
+            r = requests.get('https://www.bitstamp.net/api/ticker/', verify=False)
             j = simplejson.loads(r.content)
+            s = requests.session(config={'keep_alive': False})
             mapping = {}
             mapping['name'] = site
             mapping['parent'] = site
@@ -131,8 +137,9 @@ class Command(NoArgsCommand):
         
         site = "BTC-E"
         try:
-            r = requests.get('https://btc-e.com/api/2/btc_usd/ticker')
+            r = requests.get('https://btc-e.com/api/2/btc_usd/ticker', verify=False)
             j = simplejson.loads(r.content)
+            s = requests.session(config={'keep_alive': False})
             mapping = {}
             mapping['name'] = site
             mapping['parent'] = site
@@ -151,6 +158,7 @@ class Command(NoArgsCommand):
         try:
             r = requests.get('http://www.btcclubs.com/btc_sum.js?t=6428515')
             j = simplejson.loads(r.content)
+            s = requests.session(config={'keep_alive': False})
             total = 0
             count = 0
             for item in j['buy']:
@@ -176,6 +184,7 @@ class Command(NoArgsCommand):
             r = requests.get('https://www.huobi.com/market/huobi.php?a=detail&jsoncallback=jQuery1710527118019146838_1386320502376&_=1386320662397', verify=False)
             content = r.content.lstrip('jQuery1710527118019146838_1386320502376').replace('(', '').replace(')', '')    
             j = simplejson.loads(content)
+            s = requests.session(config={'keep_alive': False})
             mapping = {}
             mapping['name'] = site
             mapping['parent'] = site
@@ -193,8 +202,9 @@ class Command(NoArgsCommand):
 
         site = "CHBTC"
         try:
-            r = requests.get('https://www.chbtc.com/data/userticker')
+            r = requests.get('https://www.chbtc.com/data/userticker', verify=False)
             j = simplejson.loads(r.content)
+            s = requests.session(config={'keep_alive': False})
             mapping = {}
             mapping['name'] = site
             mapping['parent'] = site
@@ -213,6 +223,7 @@ class Command(NoArgsCommand):
         try:
             r = requests.get('http://www.btcchina.com/bc/ticker')
             j = simplejson.loads(r.content)
+            s = requests.session(config={'keep_alive': False})
             mapping = {}
             mapping['name'] = site
             mapping['parent'] = site
@@ -232,6 +243,7 @@ class Command(NoArgsCommand):
         try:
             r = requests.get('http://api.796.com/apiV2/ticker.html?op=futures')
             j = simplejson.loads(r.content)
+            s = requests.session(config={'keep_alive': False})
             mapping = {}
             mapping['name'] = site
             mapping['parent'] = site
@@ -250,6 +262,7 @@ class Command(NoArgsCommand):
         try:
             r = requests.get('http://www.btc38.com/trade/getTradeList.php?coinname=BTC')
             j = simplejson.loads(r.content.strip())
+            s = requests.session(config={'keep_alive': False})
             mapping = {}
             mapping['name'] = site
             mapping['parent'] = site
@@ -276,8 +289,9 @@ class Command(NoArgsCommand):
         
         site = "BTER"
         try:
-            r = requests.get('https://bter.com/api/1/ticker/btc_cny')
+            r = requests.get('https://bter.com/api/1/ticker/btc_cny', verify=False)
             j = simplejson.loads(r.content.strip())
+            s = requests.session(config={'keep_alive': False})
             mapping = {}
             mapping['name'] = site
             mapping['parent'] = site
@@ -296,8 +310,9 @@ class Command(NoArgsCommand):
         site = 'OKCOIN'
         # {"ticker": {"buy": "5730.0", "high":"5887.0", "last":"5730.5", "low":"5250.0","sell": "5730.5", "vol":"50207.4845"}}
         try:
-            r = requests.get('https://www.okcoin.com/api/ticker.do')
+            r = requests.get('https://www.okcoin.com/api/ticker.do', verify=False)
             j = simplejson.loads(r.content.strip())
+            s = requests.session(config={'keep_alive': False})
             mapping = {}
             mapping['name'] = site
             mapping['parent'] = site
@@ -315,8 +330,9 @@ class Command(NoArgsCommand):
         
         site = 'FxBTC'
         try:
-            r = requests.get('https://data.fxbtc.com/api?op=query_ticker&symbol=btc_cny')
+            r = requests.get('https://data.fxbtc.com/api?op=query_ticker&symbol=btc_cny', verify=False)
             j = simplejson.loads(r.content.strip())
+            s = requests.session(config={'keep_alive': False})
             mapping = {}
             mapping['name'] = site
             mapping['parent'] = site
@@ -342,6 +358,7 @@ class Command(NoArgsCommand):
         try:
             r = requests.get('http://www.rmbtb.com/api/thirdparty/ticker/')
             j = simplejson.loads(r.content.strip())
+            s = requests.session(config={'keep_alive': False})
             mapping = {}
             mapping['name'] = site
             mapping['parent'] = site
@@ -355,8 +372,6 @@ class Command(NoArgsCommand):
         
         except JSONDecodeError:
             print "Failed to add %s prices (%s)" % (site, 'JSONDecodeError')
-        
-        
         
         
         
