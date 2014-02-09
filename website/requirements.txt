@@ -1,0 +1,4 @@
+Django==1.5.1
+sorl-thumbnail
+django-mathfilter
+redis
